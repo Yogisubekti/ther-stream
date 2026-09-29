@@ -9,4 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep the authentication experience frontend-only until persistent accounts are explicitly requested; this preserves the requested visual clone scope.
+- Use Lovable Cloud authentication and private per-user profiles for persistent accounts; the user explicitly requested real database-backed accounts.
