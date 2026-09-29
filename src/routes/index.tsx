@@ -126,19 +126,11 @@ function Index() {
           <p className="mt-1 text-sm font-medium text-muted-foreground">Join the conversation</p>
         </header>
 
+        {user ? (
+          <div className="mt-7 flex w-full justify-center"><Feed user={user} onSignOut={handleSignOut} /></div>
+        ) : (
         <section className="glass-panel mt-7 w-full max-w-[400px] rounded-[28px] border border-surface/80 p-6 sm:p-8">
-          {user ? (
-            <div className="text-center">
-              <div className="mx-auto grid size-12 place-items-center rounded-full bg-primary/15 text-primary">
-                <UserRound className="size-5" />
-              </div>
-              <p className="mt-4 font-display text-lg font-semibold">You're signed in</p>
-              <p className="mt-1 break-all text-sm text-muted-foreground">{user.email}</p>
-              <Button type="button" variant="surface" className="mt-6 w-full" disabled={isLoading} onClick={handleSignOut}>
-                <LogOut className="size-4" />{isLoading ? "Signing out..." : "Sign Out"}
-              </Button>
-            </div>
-          ) : <>
+          <>
             <div className="relative grid grid-cols-2 rounded-full bg-muted/70 p-1" role="tablist" aria-label="Authentication mode">
             <span
               aria-hidden="true"
