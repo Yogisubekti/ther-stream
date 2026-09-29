@@ -47,7 +47,7 @@ function Notifications() {
   return (
     <ul className="glass-panel divide-y divide-border/50 overflow-hidden rounded-[24px] border border-surface/80">
       {items.map((n) => {
-        const m = META[n.type] ?? META.like!;
+        const m = META[n.type] ?? META["like"]!;
         const Icon = m.icon;
         const body = (
           <div className={`flex items-start gap-3 p-4 ${n.read ? "" : "bg-primary/10"}`}>
