@@ -93,7 +93,7 @@ export function Feed({ user, onSignOut }: { user: User; onSignOut: () => void })
     <div className="w-full max-w-[560px] space-y-4">
       <section className="glass-panel flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-surface/80 p-5">
         <div className="min-w-0">
-          <p className="font-display font-semibold">{user.user_metadata?.display_name || user.email}</p>
+          <p className="font-display font-semibold">{user.user_metadata?.['display_name'] || user.email}</p>
           <p className="text-xs text-muted-foreground">{wallet ? `Wallet ${short(wallet)} verified` : "No wallet linked"}</p>
         </div>
         <div className="flex gap-2">
