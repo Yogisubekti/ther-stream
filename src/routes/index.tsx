@@ -7,6 +7,7 @@ import signalBackground from "@/assets/ponscaster-signal-bg.jpg";
 import { Button } from "@/components/ui/button";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
+import { Feed } from "@/components/Feed";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -175,8 +176,9 @@ function Index() {
           <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
             By joining you agree to the <a href="#terms" className="font-semibold text-link underline underline-offset-2">Terms</a> and <a href="#privacy" className="font-semibold text-link underline underline-offset-2">Privacy Policy</a>.
           </p>
-          </>}
+          </>
         </section>
+        )}
       </main>
     </div>
   );
