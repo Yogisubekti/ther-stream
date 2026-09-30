@@ -69,13 +69,13 @@ export function AppShell({ title, actions, children }: { title: string; actions?
           <nav aria-label="Menu utama" className="glass-panel fixed inset-x-0 bottom-0 z-40 border-t border-surface/80 pb-[env(safe-area-inset-bottom)]">
             <ul className="mx-auto grid h-16 max-w-[600px] grid-cols-5">
               {NAV.map(({ to, label, ...rest }) => {
-                const icon = "icon" in rest ? rest.icon : null;
+                const Icon = "icon" in rest ? rest.icon : null;
                 return (
                   <li key={to}>
                     <Link to={to} activeOptions={{ exact: true, includeSearch: false }} aria-label={label} title={label} className="group flex h-full items-center justify-center text-muted-foreground data-[status=active]:text-foreground">
                       <span className="relative grid size-11 place-items-center rounded-full transition group-data-[status=active]:bg-primary/20">
-                        {icon ? (
-                          <icon className="size-[22px]" />
+                        {Icon ? (
+                          <Icon className="size-[22px]" />
                         ) : (
                           <img src={fomoLogo} alt="" width={816} height={816} className="size-[24px] rounded-md object-contain" />
                         )}
