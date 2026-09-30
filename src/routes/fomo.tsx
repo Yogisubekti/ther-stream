@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { User } from "@supabase/supabase-js";
 
-import fomoLogo from "@/assets/fomo-logo.png";
+import fomoLogo from "@/assets/fomo-logo.jpg.asset.json";
 import { AppShell } from "@/components/AppShell";
 
 export const Route = createFileRoute("/fomo")({
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/fomo")({
 function Fomo({ user: _user }: { user: User }) {
   return (
     <section className="glass-panel rounded-2xl px-6 py-10 text-center">
-      <img src={fomoLogo} alt="Logo Fomo" width={816} height={816} loading="lazy" className="mx-auto size-24 rounded-2xl object-contain" />
+      <img src={fomoLogo.url} alt="Logo Fomo" width={816} height={816} loading="lazy" className="mx-auto size-24 rounded-2xl object-contain" />
       <h2 className="mt-4 font-display text-xl font-semibold">Fomo Family</h2>
       <p className="mt-2 text-sm text-muted-foreground">
         Integrasi dengan Fomo API sedang disiapkan. Nantinya kamu bisa memantau tren FOMO langsung dari sini.
