@@ -51,7 +51,7 @@ export function AuthScreen() {
             <span className="mb-1.5 block text-xs font-semibold text-foreground/70">Email</span>
             <span className="relative block">
               <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <input required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@ponscaster.fm" className="h-11 w-full rounded-xl border border-border/60 bg-surface/75 py-2.5 pl-10 pr-3.5 text-sm outline-none transition placeholder:text-muted-foreground/75 focus:border-primary focus:ring-2 focus:ring-primary/25" />
+              <input required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@mindcaster.social" className="h-11 w-full rounded-xl border border-border/60 bg-surface/75 py-2.5 pl-10 pr-3.5 text-sm outline-none transition placeholder:text-muted-foreground/75 focus:border-primary focus:ring-2 focus:ring-primary/25" />
             </span>
           </label>
           <label className="block">

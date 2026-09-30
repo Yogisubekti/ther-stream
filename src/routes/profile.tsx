@@ -7,6 +7,7 @@ import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
+import { IdentityBadges } from "@/components/IdentityBadges";
 import { PostCard } from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,10 +18,10 @@ export const Route = createFileRoute("/profile")({
   validateSearch: z.object({ id: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: "Profil — Ponscaster" },
-      { name: "description", content: "Profil Ponscaster: bio, username, foto, dompet Web3, postingan, dan repost." },
-      { property: "og:title", content: "Profil — Ponscaster" },
-      { property: "og:description", content: "Lihat profil, postingan, dan repost di Ponscaster." },
+      { title: "Profil — Mindcaster" },
+      { name: "description", content: "Profil Mindcaster: bio, username, foto, dompet Web3, postingan, dan repost." },
+      { property: "og:title", content: "Profil — Mindcaster" },
+      { property: "og:description", content: "Lihat profil, postingan, dan repost di Mindcaster." },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -97,7 +98,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
               )}
             </div>
           </div>
-          <h2 className="mt-3 font-display text-xl font-semibold">{displayName(profile)}</h2>
+          <h2 className="mt-3 flex items-center gap-1.5 font-display text-xl font-semibold">{displayName(profile)}<IdentityBadges username={profile.username} /></h2>
           {handle(profile) ? <p className="text-sm text-muted-foreground">{handle(profile)}</p> : isMe && <p className="text-sm text-muted-foreground">Belum ada username</p>}
           {profile.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
