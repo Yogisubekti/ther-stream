@@ -15,7 +15,7 @@ const NAV = [
   { to: "/profile", label: "Profil", icon: UserRound },
 ] as const;
 
-export function AppShell({ title, children }: { title: string; children: (user: User) => ReactNode }) {
+export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: (user: User) => ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [unread, setUnread] = useState(0);
@@ -53,7 +53,8 @@ export function AppShell({ title, children }: { title: string; children: (user: 
           <header className="glass-panel sticky top-0 z-30 border-b border-surface/80">
             <div className="mx-auto flex h-14 max-w-[600px] items-center gap-3 px-4">
               <span className="grid size-8 place-items-center rounded-full bg-primary font-display text-sm font-semibold text-primary-foreground shadow-signal">P</span>
-              <h1 className="font-display text-lg font-semibold">{title}</h1>
+              <h1 className="min-w-0 flex-1 truncate font-display text-lg font-semibold">{title}</h1>
+              {actions}
             </div>
           </header>
           <main className="relative z-10 mx-auto w-full max-w-[600px] space-y-3 px-3 pb-28 pt-4 sm:px-4">{children(user)}</main>

@@ -7,6 +7,7 @@ export type Post = {
   post_likes: { user_id: string }[];
   post_reposts: { user_id: string }[];
   post_reactions: { user_id: string; emoji: string }[];
+  post_bookmarks: { user_id: string }[];
   post_comments: Comment[];
 };
 export type Profile = {
@@ -15,7 +16,7 @@ export type Profile = {
 };
 
 const AUTHOR = "id, display_name, username, avatar_url, wallet_address";
-export const POST_SELECT = `id, content, created_at, author_id, author:profiles!posts_author_id_fkey(${AUTHOR}), post_likes(user_id), post_reposts(user_id), post_reactions(user_id, emoji), post_comments(id, content, created_at, author_id, author:profiles!post_comments_author_id_fkey(${AUTHOR}))`;
+export const POST_SELECT = `id, content, created_at, author_id, author:profiles!posts_author_id_fkey(${AUTHOR}), post_likes(user_id), post_reposts(user_id), post_reactions(user_id, emoji), post_bookmarks(user_id), post_comments(id, content, created_at, author_id, author:profiles!post_comments_author_id_fkey(${AUTHOR}))`;
 
 export const REACTIONS = ["🔥", "😂", "😮", "🚀", "👏"] as const;
 

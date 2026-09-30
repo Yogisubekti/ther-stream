@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Use Lovable Cloud authentication and private per-user profiles for persistent accounts; the user explicitly requested real database-backed accounts.
+- Store bookmarks and post reports as private per-user records protected by database access rules, so saved content and reports cannot leak between accounts.
