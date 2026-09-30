@@ -60,12 +60,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
               <Link to="/profile" search={{}} aria-label="Buka profil saya" className="rounded-full outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-ring">
                 <Avatar profile={profile} size={34} />
               </Link>
-              {title === "Home" ? (
-                <div className="pointer-events-none absolute left-1/2 flex -translate-x-1/2 items-center gap-2">
-                  <BrandLogo size={30} />
-                  <span className="font-display text-base font-semibold">Mindcaster</span>
-                </div>
-              ) : <h1 className="absolute left-1/2 max-w-[55%] -translate-x-1/2 truncate font-display text-base font-semibold">{title}</h1>}
+              {title === "Home" ? <BrandLogo size={34} className="pointer-events-none absolute left-1/2 -translate-x-1/2" /> : <h1 className="absolute left-1/2 max-w-[55%] -translate-x-1/2 truncate font-display text-base font-semibold">{title}</h1>}
               <div className="ml-auto">{actions}</div>
             </div>
           </header>
