@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent, type PointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bookmark, Flag, Heart, MessageCircle, MoreHorizontal, Pencil, Repeat2, SmilePlus, Trash2 } from "lucide-react";
+import { Bookmark, ChevronDown, Flag, Heart, MessageCircle, MoreHorizontal, Pencil, Repeat2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/Avatar";
@@ -8,12 +8,17 @@ import { IdentityBadges } from "@/components/IdentityBadges";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { REACTIONS, displayName, handle, short, timeAgo, type Post } from "@/lib/social";
 
 export function PostCard({ post: p, userId, onChange, onError }: { post: Post; userId: string; onChange: () => void; onError: (m: string) => void }) {
   const [showComments, setShowComments] = useState(false);
   const [showReact, setShowReact] = useState(false);
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pressOrigin = useRef<{ x: number; y: number } | null>(null);
+  const longPressed = useRef(false);
+  const reactionPending = useRef(false);
   const [comment, setComment] = useState("");
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(p.content);
@@ -22,13 +27,60 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
   const liked = p.post_likes.some((l) => l.user_id === userId);
   const reposted = p.post_reposts.some((l) => l.user_id === userId);
   const bookmarked = p.post_bookmarks.some((l) => l.user_id === userId);
-  const counts = REACTIONS.map((e) => ({ e, n: p.post_reactions.filter((r) => r.emoji === e).length, mine: p.post_reactions.some((r) => r.emoji === e && r.user_id === userId) })).filter((r) => r.n > 0);
+  const myReaction = p.post_reactions.find((r) => r.user_id === userId)?.emoji;
+  const totalReactions = p.post_likes.length + p.post_reactions.length;
 
   async function run(q: PromiseLike<{ error: { message: string } | null }>) {
     const { error } = await q;
     if (error) onError(error.message); else onChange();
   }
-  const toggleLike = () => run(liked ? supabase.from("post_likes").delete().eq("post_id", p.id).eq("user_id", userId) : supabase.from("post_likes").insert({ post_id: p.id, user_id: userId }));
+  function clearPress() {
+    if (pressTimer.current) clearTimeout(pressTimer.current);
+    pressTimer.current = null;
+    pressOrigin.current = null;
+  }
+  function startPress(e: PointerEvent<HTMLButtonElement>) {
+    if (e.button !== 0) return;
+    clearPress();
+    longPressed.current = false;
+    pressOrigin.current = { x: e.clientX, y: e.clientY };
+    pressTimer.current = setTimeout(() => {
+      longPressed.current = true;
+      setShowReact(true);
+      clearPress();
+    }, 450);
+  }
+  function movePress(e: PointerEvent<HTMLButtonElement>) {
+    if (pressOrigin.current && Math.hypot(e.clientX - pressOrigin.current.x, e.clientY - pressOrigin.current.y) > 10) clearPress();
+  }
+  async function chooseReaction(emoji: string | null) {
+    if (reactionPending.current) return;
+    reactionPending.current = true;
+    setShowReact(false);
+    try {
+      const removing = emoji === null ? liked && !myReaction : myReaction === emoji && !liked;
+      if (myReaction) {
+        const { error } = await supabase.from("post_reactions").delete().eq("post_id", p.id).eq("user_id", userId);
+        if (error) throw error;
+      }
+      if (liked) {
+        const { error } = await supabase.from("post_likes").delete().eq("post_id", p.id).eq("user_id", userId);
+        if (error) throw error;
+      }
+      if (!removing) {
+        const { error } = emoji === null
+          ? await supabase.from("post_likes").insert({ post_id: p.id, user_id: userId })
+          : await supabase.from("post_reactions").insert({ post_id: p.id, user_id: userId, emoji });
+        if (error) throw error;
+      }
+      onChange();
+    } catch (error) {
+      onError(error instanceof Error ? error.message : "Gagal memberi reaksi.");
+      onChange();
+    } finally {
+      reactionPending.current = false;
+    }
+  }
   const toggleRepost = () => run(reposted ? supabase.from("post_reposts").delete().eq("post_id", p.id).eq("user_id", userId) : supabase.from("post_reposts").insert({ post_id: p.id, user_id: userId }));
   async function toggleBookmark() {
     const { error } = await (bookmarked
@@ -37,11 +89,6 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
     if (error) return onError(error.message);
     toast.success(bookmarked ? "Bookmark dihapus" : "Postingan disimpan");
     onChange();
-  }
-  function toggleReact(emoji: string) {
-    const mine = p.post_reactions.some((r) => r.emoji === emoji && r.user_id === userId);
-    setShowReact(false);
-    void run(mine ? supabase.from("post_reactions").delete().eq("post_id", p.id).eq("user_id", userId).eq("emoji", emoji) : supabase.from("post_reactions").insert({ post_id: p.id, user_id: userId, emoji }));
   }
   async function addComment(e: FormEvent) {
     e.preventDefault();
@@ -100,25 +147,25 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
         </DropdownMenu>
       </header>
 
-      {counts.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5 pl-[52px]">
-          {counts.map((r) => (
-            <button key={r.e} onClick={() => toggleReact(r.e)} className={`rounded-full border px-2 py-0.5 text-xs ${r.mine ? "border-primary bg-primary/15" : "border-border/60 bg-surface/60"}`}>{r.e} {r.n}</button>
-          ))}
-        </div>
-      )}
-
       <div className="relative mt-2 flex justify-between pl-[44px] text-muted-foreground">
         <Button variant="ghost" size="sm" onClick={() => setShowComments((v) => !v)} aria-label="Komentar"><MessageCircle className="size-4" />{p.post_comments.length}</Button>
         <Button variant="ghost" size="sm" onClick={toggleRepost} aria-pressed={reposted} aria-label="Repost" className={reposted ? "text-primary" : ""}><Repeat2 className="size-4" />{p.post_reposts.length}</Button>
-        <Button variant="ghost" size="sm" onClick={toggleLike} aria-pressed={liked} aria-label="Like"><Heart className={`size-4 ${liked ? "fill-primary text-primary" : ""}`} />{p.post_likes.length}</Button>
-        <Button variant="ghost" size="sm" onClick={() => setShowReact((v) => !v)} aria-label="React"><SmilePlus className="size-4" /></Button>
-        <Button variant="ghost" size="icon" className={bookmarked ? "text-primary" : ""} onClick={toggleBookmark} aria-pressed={bookmarked} aria-label={bookmarked ? "Hapus bookmark" : "Bookmark"}><Bookmark className={`size-4 ${bookmarked ? "fill-primary" : ""}`} /></Button>
-        {showReact && (
-          <div className="absolute bottom-full right-0 z-20 mb-1 flex gap-1 rounded-full border border-border/60 bg-surface p-1 shadow-tab">
-            {REACTIONS.map((e) => <button key={e} onClick={() => toggleReact(e)} className="grid size-9 place-items-center rounded-full text-lg transition hover:scale-125">{e}</button>)}
+        <Popover open={showReact} onOpenChange={setShowReact}>
+          <div className="flex items-center">
+            <PopoverAnchor asChild>
+              <Button variant="ghost" size="sm" onPointerDown={startPress} onPointerMove={movePress} onPointerUp={clearPress} onPointerCancel={clearPress} onPointerLeave={clearPress} onContextMenu={(e) => e.preventDefault()} onClick={() => { if (longPressed.current) { longPressed.current = false; return; } void chooseReaction(null); }} aria-pressed={liked || Boolean(myReaction)} aria-label="Suka postingan; tahan untuk pilihan reaksi" className={liked || myReaction ? "text-primary touch-manipulation" : "touch-manipulation"}>
+                {myReaction ? <span className="text-base leading-none" aria-hidden="true">{myReaction}</span> : <Heart className={`size-4 ${liked ? "fill-primary" : ""}`} />}
+                {totalReactions}
+              </Button>
+            </PopoverAnchor>
+            <Button variant="ghost" size="icon" className="size-6" aria-label="Pilihan reaksi" aria-expanded={showReact} onClick={() => setShowReact((open) => !open)}><ChevronDown className="size-3.5" /></Button>
           </div>
-        )}
+          <PopoverContent side="top" align="center" sideOffset={8} className="flex w-auto max-w-[calc(100vw-1rem)] items-center gap-0.5 rounded-full border-border bg-popover p-1.5 shadow-tab">
+            <Button type="button" variant="ghost" size="icon" className={liked ? "size-9 text-primary" : "size-9"} aria-label="Suka" aria-pressed={liked} onClick={() => void chooseReaction(null)}><Heart className={`size-5 ${liked ? "fill-primary" : ""}`} /></Button>
+            {REACTIONS.map((emoji) => <Button type="button" variant="ghost" size="icon" key={emoji} className={myReaction === emoji ? "size-9 bg-accent text-lg" : "size-9 text-lg"} aria-label={`Reaksi ${emoji}`} aria-pressed={myReaction === emoji} onClick={() => void chooseReaction(emoji)}>{emoji}</Button>)}
+          </PopoverContent>
+        </Popover>
+        <Button variant="ghost" size="icon" className={bookmarked ? "text-primary" : ""} onClick={toggleBookmark} aria-pressed={bookmarked} aria-label={bookmarked ? "Hapus bookmark" : "Bookmark"}><Bookmark className={`size-4 ${bookmarked ? "fill-primary" : ""}`} /></Button>
       </div>
 
       {showComments && (
