@@ -13,9 +13,9 @@ import { fetchPosts, type Post } from "@/lib/social";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Ponscaster — Join the conversation" },
-      { name: "description", content: "Ponscaster: social chain untuk posting, like, react, komentar, dan repost bersama komunitas Web3." },
-      { property: "og:title", content: "Ponscaster — Join the conversation" },
+      { title: "Mindcaster — Join the conversation" },
+      { name: "description", content: "Mindcaster: social chain untuk posting, like, react, komentar, dan repost bersama komunitas Web3." },
+      { property: "og:title", content: "Mindcaster — Join the conversation" },
       { property: "og:description", content: "Social chain untuk posting, like, react, komentar, dan repost bersama komunitas Web3." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -72,7 +72,7 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
       {view === "groups" ? (
         <section className="glass-panel flex min-h-64 flex-col items-center justify-center rounded-[24px] border border-surface/80 px-6 text-center">
           <span className="grid size-14 place-items-center rounded-full bg-primary/15 text-primary"><Users className="size-7" /></span>
-          <h2 className="mt-4 font-display text-lg font-semibold">Grup Ponscaster</h2>
+          <h2 className="mt-4 font-display text-lg font-semibold">Grup Mindcaster</h2>
           <p className="mt-1 max-w-xs text-sm text-muted-foreground">Ruang komunitas sedang disiapkan. Anda akan segera bisa menemukan dan bergabung ke grup.</p>
           <Button variant="surface" size="sm" className="mt-5" onClick={onHome}>Kembali ke Home</Button>
         </section>

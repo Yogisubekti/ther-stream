@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
+import { IdentityBadges } from "@/components/IdentityBadges";
 import { PostCard } from "@/components/PostCard";
 import { supabase } from "@/integrations/supabase/client";
 import { displayName, fetchPosts, handle, type Post, type Profile } from "@/lib/social";
@@ -12,10 +13,10 @@ import { displayName, fetchPosts, handle, type Post, type Profile } from "@/lib/
 export const Route = createFileRoute("/discover")({
   head: () => ({
     meta: [
-      { title: "Discover — Ponscaster" },
-      { name: "description", content: "Temukan pengguna dan postingan yang sedang ramai di Ponscaster." },
-      { property: "og:title", content: "Discover — Ponscaster" },
-      { property: "og:description", content: "Temukan pengguna dan postingan yang sedang ramai di Ponscaster." },
+      { title: "Discover — Mindcaster" },
+      { name: "description", content: "Temukan pengguna dan postingan yang sedang ramai di Mindcaster." },
+      { property: "og:title", content: "Discover — Mindcaster" },
+      { property: "og:description", content: "Temukan pengguna dan postingan yang sedang ramai di Mindcaster." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -62,7 +63,7 @@ function Discover({ user }: { user: User }) {
               <Link to="/profile" search={{ id: p.id }} className="flex min-w-0 flex-1 items-center gap-3">
                 <Avatar profile={p} />
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">{displayName(p)}</span>
+                  <span className="flex items-center gap-1 truncate text-sm font-semibold">{displayName(p)}<IdentityBadges username={p.username} /></span>
                   <span className="block truncate text-xs text-muted-foreground">{handle(p) ?? p.bio ?? ""}</span>
                 </span>
               </Link>

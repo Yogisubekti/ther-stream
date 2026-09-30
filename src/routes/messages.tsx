@@ -6,6 +6,7 @@ import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
+import { IdentityBadges } from "@/components/IdentityBadges";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { displayName, handle, timeAgo, type Profile } from "@/lib/social";
@@ -14,10 +15,10 @@ export const Route = createFileRoute("/messages")({
   validateSearch: z.object({ with: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: "Pesan — Ponscaster" },
-      { name: "description", content: "Kirim pesan langsung (DM) ke pengguna Ponscaster lain." },
-      { property: "og:title", content: "Pesan — Ponscaster" },
-      { property: "og:description", content: "Pesan langsung antar pengguna Ponscaster." },
+      { title: "Pesan — Mindcaster" },
+      { name: "description", content: "Kirim pesan langsung (DM) ke pengguna Mindcaster lain." },
+      { property: "og:title", content: "Pesan — Mindcaster" },
+      { property: "og:description", content: "Pesan langsung antar pengguna Mindcaster." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -62,7 +63,7 @@ function Inbox({ user }: { user: User }) {
           <Link to="/messages" search={{ with: profile.id }} className="flex items-center gap-3 p-4">
             <Avatar profile={profile} />
             <span className="min-w-0 flex-1">
-              <span className="flex justify-between gap-2"><span className="truncate text-sm font-semibold">{displayName(profile)}</span><span className="text-xs text-muted-foreground">{timeAgo(last.created_at)}</span></span>
+              <span className="flex justify-between gap-2"><span className="flex items-center gap-1 truncate text-sm font-semibold">{displayName(profile)}<IdentityBadges username={profile.username} /></span><span className="text-xs text-muted-foreground">{timeAgo(last.created_at)}</span></span>
               <span className="block truncate text-sm text-muted-foreground">{last.sender_id === user.id ? "Anda: " : ""}{last.content}</span>
             </span>
           </Link>
@@ -109,7 +110,7 @@ function Thread({ user, otherId }: { user: User; otherId: string }) {
         <Link to="/messages" search={{}} aria-label="Kembali" className="grid size-9 place-items-center rounded-full hover:bg-muted"><ArrowLeft className="size-4" /></Link>
         <Avatar profile={other} size={36} />
         <Link to="/profile" search={{ id: otherId }} className="min-w-0">
-          <p className="truncate text-sm font-semibold">{displayName(other)}</p>
+          <p className="flex items-center gap-1 truncate text-sm font-semibold">{displayName(other)}<IdentityBadges username={other?.username} /></p>
           {handle(other) && <p className="text-xs text-muted-foreground">{handle(other)}</p>}
         </Link>
       </div>

@@ -4,6 +4,7 @@ import { Bookmark, Flag, Heart, MessageCircle, MoreHorizontal, Pencil, Repeat2, 
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/Avatar";
+import { IdentityBadges } from "@/components/IdentityBadges";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -79,6 +80,7 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
         <div className="min-w-0 flex-1">
           <Link to="/profile" search={{ id: p.author_id }} className="flex flex-wrap items-baseline gap-x-1.5">
             <span className="font-display text-sm font-semibold">{displayName(p.author)}</span>
+            <IdentityBadges username={p.author?.username} />
             {handle(p.author) && <span className="text-xs text-muted-foreground">{handle(p.author)}</span>}
             <span className="text-xs text-muted-foreground">· {timeAgo(p.created_at)}</span>
           </Link>
@@ -124,7 +126,7 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
           {p.post_comments.map((c) => (
             <div key={c.id} className="flex items-start gap-2 text-sm">
               <Avatar profile={c.author} size={28} />
-              <p className="flex-1 break-words"><span className="font-semibold">{displayName(c.author)}</span> {c.content}</p>
+              <p className="flex-1 break-words"><span className="inline-flex items-center gap-1 font-semibold">{displayName(c.author)}<IdentityBadges username={c.author?.username} /></span> {c.content}</p>
               {c.author_id === userId && <Button variant="ghost" size="icon" className="size-7" aria-label="Hapus komentar" onClick={() => run(supabase.from("post_comments").delete().eq("id", c.id))}><Trash2 className="size-3.5" /></Button>}
             </div>
           ))}

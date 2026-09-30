@@ -4,16 +4,17 @@ import { Heart, Mail, MessageCircle, Repeat2, SmilePlus } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
+import { IdentityBadges } from "@/components/IdentityBadges";
 import { supabase } from "@/integrations/supabase/client";
 import { displayName, timeAgo, type Author } from "@/lib/social";
 
 export const Route = createFileRoute("/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifikasi — Ponscaster" },
+      { title: "Notifikasi — Mindcaster" },
       { name: "description", content: "Lihat siapa yang like, react, komentar, repost, dan mengirim pesan kepada Anda." },
-      { property: "og:title", content: "Notifikasi — Ponscaster" },
-      { property: "og:description", content: "Aktivitas terbaru di akun Ponscaster Anda." },
+      { property: "og:title", content: "Notifikasi — Mindcaster" },
+      { property: "og:description", content: "Aktivitas terbaru di akun Mindcaster Anda." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -54,7 +55,7 @@ function Notifications() {
             <Icon className="mt-2.5 size-4 shrink-0 text-primary" />
             <Avatar profile={n.actor} size={36} />
             <p className="min-w-0 flex-1 text-sm">
-              <span className="font-semibold">{displayName(n.actor)}</span> {m.text} {n.type === "reaction" ? n.detail : n.detail && <span className="text-muted-foreground">“{n.detail}”</span>}
+              <span className="inline-flex items-center gap-1 font-semibold">{displayName(n.actor)}<IdentityBadges username={n.actor?.username} /></span> {m.text} {n.type === "reaction" ? n.detail : n.detail && <span className="text-muted-foreground">“{n.detail}”</span>}
               <span className="block text-xs text-muted-foreground">{timeAgo(n.created_at)}</span>
             </p>
           </div>

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export function walletMessage(userId: string, address: string, issuedAt: string) {
-  return `Ponscaster wallet link\nUser: ${userId}\nWallet: ${address.toLowerCase()}\nIssued: ${issuedAt}`;
+  return `Mindcaster wallet link\nUser: ${userId}\nWallet: ${address.toLowerCase()}\nIssued: ${issuedAt}`;
 }
 
 export const linkWallet = createServerFn({ method: "POST" })
