@@ -1,9 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bell, Compass, Eye, Home, Mail } from "lucide-react";
+import { Bell, Compass, Home, Mail } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import signalBackground from "@/assets/ponscaster-signal-bg.jpg";
+import fomoLogo from "@/assets/fomo-logo.png";
 import { AuthScreen } from "@/components/AuthScreen";
 import { Avatar } from "@/components/Avatar";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -15,7 +16,7 @@ const NAV = [
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/notifications", label: "Notifikasi", icon: Bell },
   { to: "/messages", label: "Pesan", icon: Mail },
-  { to: "/profile", label: "Fomo", icon: Eye },
+  { to: "/fomo", label: "Fomo" },
 ] as const;
 
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: (user: User) => ReactNode }) {
@@ -67,16 +68,23 @@ export function AppShell({ title, actions, children }: { title: string; actions?
           <main className="relative z-10 mx-auto w-full max-w-[600px] space-y-3 px-3 pb-28 pt-4 sm:px-4">{children(user)}</main>
           <nav aria-label="Menu utama" className="glass-panel fixed inset-x-0 bottom-0 z-40 border-t border-surface/80 pb-[env(safe-area-inset-bottom)]">
             <ul className="mx-auto grid h-16 max-w-[600px] grid-cols-5">
-              {NAV.map(({ to, label, icon: Icon }) => (
-                <li key={to}>
-                  <Link to={to} activeOptions={{ exact: true, includeSearch: false }} aria-label={label} title={label} className="group flex h-full items-center justify-center text-muted-foreground data-[status=active]:text-foreground">
-                    <span className="relative grid size-11 place-items-center rounded-full transition group-data-[status=active]:bg-primary/20">
-                      <Icon className="size-[22px]" />
-                      {to === "/notifications" && unread > 0 && <span className="absolute right-1.5 top-0.5 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">{unread > 9 ? "9+" : unread}</span>}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+              {NAV.map(({ to, label, ...rest }) => {
+                const Icon = "icon" in rest ? rest.icon : null;
+                return (
+                  <li key={to}>
+                    <Link to={to} activeOptions={{ exact: true, includeSearch: false }} aria-label={label} title={label} className="group flex h-full items-center justify-center text-muted-foreground data-[status=active]:text-foreground">
+                      <span className="relative grid size-11 place-items-center rounded-full transition group-data-[status=active]:bg-primary/20">
+                        {Icon ? (
+                          <Icon className="size-[22px]" />
+                        ) : (
+                          <img src={fomoLogo} alt="" width={816} height={816} className="size-[24px] rounded-md object-contain" />
+                        )}
+                        {to === "/notifications" && unread > 0 && <span className="absolute right-1.5 top-0.5 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">{unread > 9 ? "9+" : unread}</span>}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </>
