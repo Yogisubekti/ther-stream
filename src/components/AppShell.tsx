@@ -77,7 +77,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                         {Icon ? (
                           <Icon className="size-[22px]" />
                         ) : (
-                          <img src={fomoLogo} alt="" width={816} height={816} className="size-[24px] rounded-md object-contain" />
+                          <img src={fomoLogo.url} alt="" width={816} height={816} className="size-[24px] rounded-md object-contain" />
                         )}
                         {to === "/notifications" && unread > 0 && <span className="absolute right-1.5 top-0.5 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">{unread > 9 ? "9+" : unread}</span>}
                       </span>
