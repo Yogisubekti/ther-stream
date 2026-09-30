@@ -4,7 +4,7 @@ import { Bell, Compass, Home, Mail } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import signalBackground from "@/assets/ponscaster-signal-bg.jpg";
-import fomoLogo from "@/assets/fomo-logo.png";
+import fomoLogo from "@/assets/fomo-logo.jpg.asset.json";
 import { AuthScreen } from "@/components/AuthScreen";
 import { Avatar } from "@/components/Avatar";
 import { BrandLogo } from "@/components/BrandLogo";

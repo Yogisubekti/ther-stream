@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { User } from "@supabase/supabase-js";
 
-import fomoLogo from "@/assets/fomo-logo.png";
+import fomoLogo from "@/assets/fomo-logo.jpg.asset.json";
 import { AppShell } from "@/components/AppShell";
 
 export const Route = createFileRoute("/fomo")({
