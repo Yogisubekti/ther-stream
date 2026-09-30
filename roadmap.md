@@ -9,5 +9,6 @@
 - [x] Add bookmark controls and saved-post list
 - [x] Add Home menu with groups and coming-soon items
 - [x] Rebrand to Mindcaster with the supplied logo, verified account badges, and icon-only navigation
+- [x] Move post emoji reactions into the love control (tap for like, hold or open choices for other reactions)
 - [x] Verify build and signed-out desktop/mobile views
 - [ ] Verify signed-in browser flows — blocked until the requesting user signs in or identifies a test account
