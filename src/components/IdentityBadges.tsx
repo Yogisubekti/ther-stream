@@ -4,7 +4,7 @@ import { BrandLogo } from "@/components/BrandLogo";
 
 const VERIFIED_USERS = new Set(["ybs", "thorvox", "mindcaster"]);
 
-export function IdentityBadges({ username }: { username?: string | null }) {
+export function IdentityBadges({ username }: { username?: string | null | undefined }) {
   if (!username || !VERIFIED_USERS.has(username.toLowerCase())) return null;
   return (
     <span className="inline-flex shrink-0 items-center gap-0.5" aria-label="Akun terverifikasi Mindcaster" title="Akun terverifikasi Mindcaster">
