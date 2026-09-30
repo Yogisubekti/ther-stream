@@ -1,9 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bell, Compass, Eye, Home, Mail } from "lucide-react";
+import { Bell, Compass, Home, Mail } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import signalBackground from "@/assets/ponscaster-signal-bg.jpg";
+import fomoLogo from "@/assets/fomo-logo.png";
 import { AuthScreen } from "@/components/AuthScreen";
 import { Avatar } from "@/components/Avatar";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -15,7 +16,7 @@ const NAV = [
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/notifications", label: "Notifikasi", icon: Bell },
   { to: "/messages", label: "Pesan", icon: Mail },
-  { to: "/profile", label: "Fomo", icon: Eye },
+  { to: "/fomo", label: "Fomo" },
 ] as const;
 
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: (user: User) => ReactNode }) {

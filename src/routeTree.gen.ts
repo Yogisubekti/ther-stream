@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as FomoRouteImport } from './routes/fomo'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FomoRoute = FomoRouteImport.update({
+  id: '/fomo',
+  path: '/fomo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesRoute = MessagesRouteImport.update({
@@ -44,6 +50,7 @@ const ProfileRoute = ProfileRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/discover': typeof DiscoverRoute
+  '/fomo': typeof FomoRoute
   '/messages': typeof MessagesRoute
   '/notifications': typeof NotificationsRoute
   '/profile': typeof ProfileRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/discover': typeof DiscoverRoute
+  '/fomo': typeof FomoRoute
   '/messages': typeof MessagesRoute
   '/notifications': typeof NotificationsRoute
   '/profile': typeof ProfileRoute
@@ -59,22 +67,31 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/discover': typeof DiscoverRoute
+  '/fomo': typeof FomoRoute
   '/messages': typeof MessagesRoute
   '/notifications': typeof NotificationsRoute
   '/profile': typeof ProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/discover' | '/messages' | '/notifications' | '/profile'
+  fullPaths:
+    '/' | '/discover' | '/fomo' | '/messages' | '/notifications' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/discover' | '/messages' | '/notifications' | '/profile'
+  to: '/' | '/discover' | '/fomo' | '/messages' | '/notifications' | '/profile'
   id:
-    '__root__' | '/' | '/discover' | '/messages' | '/notifications' | '/profile'
+    | '__root__'
+    | '/'
+    | '/discover'
+    | '/fomo'
+    | '/messages'
+    | '/notifications'
+    | '/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DiscoverRoute: typeof DiscoverRoute
+  FomoRoute: typeof FomoRoute
   MessagesRoute: typeof MessagesRoute
   NotificationsRoute: typeof NotificationsRoute
   ProfileRoute: typeof ProfileRoute
@@ -94,6 +111,13 @@ declare module '@tanstack/react-router' {
       path: '/discover'
       fullPath: '/discover'
       preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fomo': {
+      id: '/fomo'
+      path: '/fomo'
+      fullPath: '/fomo'
+      preLoaderRoute: typeof FomoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/messages': {
@@ -123,6 +147,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DiscoverRoute: DiscoverRoute,
+  FomoRoute: FomoRoute,
   MessagesRoute: MessagesRoute,
   NotificationsRoute: NotificationsRoute,
   ProfileRoute: ProfileRoute,
