@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { BadgeCheck, Bookmark, Check, Languages, Menu, Moon, Send, Sun, Users, UserRoundPlus } from "lucide-react";
+import { BadgeCheck, Bookmark, Check, Languages, Menu, Moon, ImagePlus, Send, Sun, Users, UserRoundPlus } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
 import { PostCard } from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { uploadImage } from "@/lib/upload";
 import { supabase } from "@/integrations/supabase/client";
 import { usePreferences, type LanguagePreference, type ThemePreference } from "@/lib/preferences";
 import { fetchPosts, type Post } from "@/lib/social";
@@ -62,6 +63,8 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
   const { t } = usePreferences();
   const [posts, setPosts] = useState<Post[]>([]);
   const [draft, setDraft] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const load = useCallback(async () => {
     try {
@@ -76,10 +79,14 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
 
   async function createPost(e: FormEvent) {
     e.preventDefault();
-    if (!draft.trim()) return;
-    const { error } = await supabase.from("posts").insert({ author_id: user.id, content: draft.trim() });
-    if (error) return setError(error.message);
-    setDraft(""); void load();
+    if (!draft.trim() && !image) return;
+    setBusy(true); setError(null);
+    try {
+      const image_url = image ? await uploadImage(image, "post") : null;
+      const { error } = await supabase.from("posts").insert({ author_id: user.id, content: draft.trim(), image_url });
+      if (error) throw error;
+      setDraft(""); setImage(null); void load();
+    } catch (err) { setError((err as Error).message); } finally { setBusy(false); }
   }
 
   return (
@@ -100,9 +107,13 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
       ) : <>
       <form onSubmit={createPost} className="glass-panel rounded-[24px] border border-surface/80 p-4">
         <textarea value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={500} rows={3} placeholder={t("whatsHappening")} className="w-full resize-none rounded-xl border border-border/60 bg-surface/75 p-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/25" />
+        {image && <div className="relative mt-2"><img src={URL.createObjectURL(image)} alt="Pratinjau" className="max-h-60 w-full rounded-xl object-cover" /><button type="button" onClick={() => setImage(null)} aria-label="Hapus gambar" className="absolute right-2 top-2 rounded-full bg-background/80 px-2 text-sm">✕</button></div>}
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">{draft.length}/500</span>
-           <Button type="submit" size="sm" disabled={!draft.trim()}><Send className="size-4" />{t("post")}</Button>
+          <span className="flex items-center gap-3 text-xs text-muted-foreground">
+            <label className="cursor-pointer text-primary" aria-label="Tambah gambar"><ImagePlus className="size-5" /><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f && f.size > 10 * 1024 * 1024) return setError("Ukuran maksimal 10 MB."); setImage(f ?? null); }} /></label>
+            {draft.length}/500
+          </span>
+           <Button type="submit" size="sm" disabled={busy || (!draft.trim() && !image)}><Send className="size-4" />{t("post")}</Button>
         </div>
       </form>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}

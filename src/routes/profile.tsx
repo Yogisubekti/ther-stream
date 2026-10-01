@@ -10,6 +10,7 @@ import { Avatar } from "@/components/Avatar";
 import { IdentityBadges } from "@/components/IdentityBadges";
 import { PostCard } from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
+import { uploadImage } from "@/lib/upload";
 import { supabase } from "@/integrations/supabase/client";
 import { linkWallet, walletMessage } from "@/lib/wallet.functions";
 import { displayName, fetchPosts, handle, joined, resizeImage, short, type Post, type Profile } from "@/lib/social";
@@ -145,8 +146,8 @@ function EditProfile({ profile, onDone }: { profile: Profile; onDone: () => void
 
   async function pick(file?: File) {
     if (!file) return;
-    if (!file.type.startsWith("image/")) return setError("Pilih file gambar.");
-    try { setAvatar(await resizeImage(file)); } catch { setError("Gagal membaca gambar."); }
+    setError(null); setSaving(true);
+    try { setAvatar(await uploadImage(file, "avatar")); } catch (e) { setError((e as Error).message); } finally { setSaving(false); }
   }
 
   const field = "h-10 w-full rounded-xl border border-border/60 bg-surface/75 px-3 text-sm outline-none focus:border-primary";
