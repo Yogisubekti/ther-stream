@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "59322339-34a8-441d-80a9-65202f92a933",
-  "project_id": "111af112-fac4-4e2e-9965-f77090ea06a0",
-  "url": "/__l5e/assets-v1/59322339-34a8-441d-80a9-65202f92a933/fomo-logo.jpg",
-  "r2_key": "a/v1/111af112-fac4-4e2e-9965-f77090ea06a0/59322339-34a8-441d-80a9-65202f92a933/fomo-logo.jpg",
-  "original_filename": "fomo-logo.jpg",
-  "size": 7625,
   "content_type": "image/jpeg",
-  "created_at": "2026-09-30T19:03:04Z"
+  "created_at": "2026-09-30T19:03:04Z",
+  "original_filename": "fomo-logo.jpg",
+  "project_id": "77fd6ab1-fec6-4afb-8cc4-6a73d6ba8f43",
+  "r2_key": "a/v1/77fd6ab1-fec6-4afb-8cc4-6a73d6ba8f43/59322339-34a8-441d-80a9-65202f92a933/fomo-logo.jpg",
+  "size": 7625,
+  "url": "/__l5e/assets-v1/59322339-34a8-441d-80a9-65202f92a933/fomo-logo.jpg",
+  "version": 1
 }
