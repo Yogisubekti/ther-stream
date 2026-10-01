@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { BadgeCheck, Bookmark, Menu, Send, Users, UserRoundPlus } from "lucide-react";
+import { BadgeCheck, Bookmark, Check, Languages, Menu, Moon, Send, Sun, Users, UserRoundPlus } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
@@ -8,6 +8,7 @@ import { PostCard } from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
+import { usePreferences, type LanguagePreference, type ThemePreference } from "@/lib/preferences";
 import { fetchPosts, type Post } from "@/lib/social";
 
 export const Route = createFileRoute("/")({
@@ -27,17 +28,30 @@ export const Route = createFileRoute("/")({
 type HomeView = "home" | "bookmarks" | "groups";
 
 function HomeRoute() {
+  const { language, setLanguage, theme, setTheme, t } = usePreferences();
   const [view, setView] = useState<HomeView>("home");
-  const title = view === "bookmarks" ? "Bookmark" : view === "groups" ? "Grup" : "Home";
+  const title = view === "bookmarks" ? t("bookmarks") : view === "groups" ? t("groups") : "Home";
+  const languageOptions: { value: LanguagePreference; label: string }[] = [
+    { value: "auto", label: t("automatic") }, { value: "id", label: t("indonesian") }, { value: "en", label: t("english") },
+  ];
+  const themeOptions: { value: ThemePreference; label: string }[] = [
+    { value: "system", label: t("system") }, { value: "light", label: t("light") }, { value: "dark", label: t("dark") },
+  ];
   const actions = (
     <DropdownMenu>
       <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-9" aria-label="Menu Home"><Menu className="size-5" /></Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
-        <DropdownMenuItem onSelect={() => setView("groups")}><Users />Grup</DropdownMenuItem>
-        <DropdownMenuItem disabled><UserRoundPlus />Buat grup <span className="ml-auto text-[10px] font-semibold text-muted-foreground">SEGERA</span></DropdownMenuItem>
-        <DropdownMenuItem disabled><BadgeCheck />Verifikasi akun <span className="ml-auto text-[10px] font-semibold text-muted-foreground">SEGERA</span></DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => setView("groups")}><Users />{t("groups")}</DropdownMenuItem>
+        <DropdownMenuItem disabled><UserRoundPlus />{t("createGroup")} <span className="ml-auto text-[10px] font-semibold text-muted-foreground">{t("soon")}</span></DropdownMenuItem>
+        <DropdownMenuItem disabled><BadgeCheck />{t("verifyAccount")} <span className="ml-auto text-[10px] font-semibold text-muted-foreground">{t("soon")}</span></DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => setView("bookmarks")}><Bookmark />Bookmark</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => setView("bookmarks")}><Bookmark />{t("bookmarks")}</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <div className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground"><Languages className="mr-1.5 inline size-3.5" />{t("language")}</div>
+        {languageOptions.map((option) => <DropdownMenuItem key={option.value} onSelect={() => setLanguage(option.value)} className="pl-7">{option.label}{language === option.value && <Check className="ml-auto size-4" />}</DropdownMenuItem>)}
+        <DropdownMenuSeparator />
+        <div className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground">{theme === "dark" ? <Moon className="mr-1.5 inline size-3.5" /> : <Sun className="mr-1.5 inline size-3.5" />}{t("appearance")}</div>
+        {themeOptions.map((option) => <DropdownMenuItem key={option.value} onSelect={() => setTheme(option.value)} className="pl-7">{option.label}{theme === option.value && <Check className="ml-auto size-4" />}</DropdownMenuItem>)}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -45,6 +59,7 @@ function HomeRoute() {
 }
 
 function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: () => void }) {
+  const { t } = usePreferences();
   const [posts, setPosts] = useState<Post[]>([]);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -84,14 +99,14 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
         </>
       ) : <>
       <form onSubmit={createPost} className="glass-panel rounded-[24px] border border-surface/80 p-4">
-        <textarea value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={500} rows={3} placeholder="Apa yang sedang terjadi?" className="w-full resize-none rounded-xl border border-border/60 bg-surface/75 p-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/25" />
+        <textarea value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={500} rows={3} placeholder={t("whatsHappening")} className="w-full resize-none rounded-xl border border-border/60 bg-surface/75 p-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/25" />
         <div className="mt-3 flex items-center justify-between">
           <span className="text-xs text-muted-foreground">{draft.length}/500</span>
-          <Button type="submit" size="sm" disabled={!draft.trim()}><Send className="size-4" />Post</Button>
+           <Button type="submit" size="sm" disabled={!draft.trim()}><Send className="size-4" />{t("post")}</Button>
         </div>
       </form>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      {posts.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">Belum ada postingan. Mulai percakapan!</p>}
+       {posts.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">{t("noPosts")}</p>}
       {posts.map((p) => <PostCard key={p.id} post={p} userId={user.id} onChange={load} onError={setError} />)}
       </>}
     </>

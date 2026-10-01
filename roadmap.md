@@ -12,3 +12,5 @@
 - [x] Move post emoji reactions into the love control (tap for like, hold or open choices for other reactions)
 - [x] Verify build and signed-out desktop/mobile views
 - [ ] Verify signed-in browser flows — blocked until the requesting user signs in or identifies a test account
+- [ ] Move post usernames below names and add Follow controls
+- [ ] Add Indonesian/English language and light/dark appearance options
