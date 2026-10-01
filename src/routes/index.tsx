@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { uploadImage } from "@/lib/upload";
 import { supabase } from "@/integrations/supabase/client";
-import { usePreferences, type LanguagePreference, type ThemePreference } from "@/lib/preferences";
+import { usePreferences, type LanguagePreference } from "@/lib/preferences";
 import { fetchPosts, type Post } from "@/lib/social";
 
 export const Route = createFileRoute("/")({
@@ -29,14 +29,11 @@ export const Route = createFileRoute("/")({
 type HomeView = "home" | "bookmarks" | "groups";
 
 function HomeRoute() {
-  const { language, setLanguage, theme, setTheme, t } = usePreferences();
+  const { language, setLanguage, t } = usePreferences();
   const [view, setView] = useState<HomeView>("home");
   const title = view === "bookmarks" ? t("bookmarks") : view === "groups" ? t("groups") : "Home";
   const languageOptions: { value: LanguagePreference; label: string }[] = [
     { value: "auto", label: t("automatic") }, { value: "id", label: t("indonesian") }, { value: "en", label: t("english") },
-  ];
-  const themeOptions: { value: ThemePreference; label: string }[] = [
-    { value: "system", label: t("system") }, { value: "light", label: t("light") }, { value: "dark", label: t("dark") },
   ];
   const actions = (
     <DropdownMenu>
