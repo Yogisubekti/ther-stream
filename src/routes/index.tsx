@@ -47,9 +47,6 @@ function HomeRoute() {
         <DropdownMenuSeparator />
         <div className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground"><Languages className="mr-1.5 inline size-3.5" />{t("language")}</div>
         {languageOptions.map((option) => <DropdownMenuItem key={option.value} onSelect={() => setLanguage(option.value)} className="pl-7">{option.label}{language === option.value && <Check className="ml-auto size-4" />}</DropdownMenuItem>)}
-        <DropdownMenuSeparator />
-        <div className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground">{theme === "dark" ? <Moon className="mr-1.5 inline size-3.5" /> : <Sun className="mr-1.5 inline size-3.5" />}{t("appearance")}</div>
-        {themeOptions.map((option) => <DropdownMenuItem key={option.value} onSelect={() => setTheme(option.value)} className="pl-7">{option.label}{theme === option.value && <Check className="ml-auto size-4" />}</DropdownMenuItem>)}
       </DropdownMenuContent>
     </DropdownMenu>
   );
