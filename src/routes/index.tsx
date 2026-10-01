@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { BadgeCheck, Bookmark, Check, Languages, Menu, Moon, ImagePlus, Send, Sun, Users, UserRoundPlus } from "lucide-react";
+import { BadgeCheck, Bookmark, Check, Languages, Menu, ImagePlus, Send, Users, UserRoundPlus } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";

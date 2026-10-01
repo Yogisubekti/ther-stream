@@ -1,14 +1,13 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 export type LanguagePreference = "auto" | "id" | "en";
-export type ThemePreference = "system" | "light" | "dark";
 export type Locale = "id" | "en";
 
 const copy = {
   id: {
     home: "Beranda", discover: "Temukan", notifications: "Notifikasi", messages: "Pesan", profile: "Profil",
-    follow: "Ikuti", following: "Mengikuti", language: "Bahasa", appearance: "Tampilan", automatic: "Otomatis",
-    indonesian: "Bahasa Indonesia", english: "English", system: "Ikuti perangkat", light: "Terang", dark: "Gelap",
+    follow: "Ikuti", following: "Mengikuti", language: "Bahasa", automatic: "Otomatis",
+    indonesian: "Bahasa Indonesia", english: "English",
     groups: "Grup", createGroup: "Buat grup", verifyAccount: "Verifikasi akun", bookmarks: "Bookmark", soon: "SEGERA",
     whatsHappening: "Apa yang sedang terjadi?", post: "Post", noPosts: "Belum ada postingan. Mulai percakapan!",
     comments: "Komentar", repost: "Repost", likePost: "Suka postingan; tahan untuk pilihan reaksi", reactionChoices: "Pilihan reaksi",
@@ -23,8 +22,8 @@ const copy = {
   },
   en: {
     home: "Home", discover: "Discover", notifications: "Notifications", messages: "Messages", profile: "Profile",
-    follow: "Follow", following: "Following", language: "Language", appearance: "Appearance", automatic: "Automatic",
-    indonesian: "Bahasa Indonesia", english: "English", system: "Use device setting", light: "Light", dark: "Dark",
+    follow: "Follow", following: "Following", language: "Language", automatic: "Automatic",
+    indonesian: "Bahasa Indonesia", english: "English",
     groups: "Groups", createGroup: "Create group", verifyAccount: "Verify account", bookmarks: "Bookmarks", soon: "SOON",
     whatsHappening: "What's happening?", post: "Post", noPosts: "No posts yet. Start the conversation!",
     comments: "Comments", repost: "Repost", likePost: "Like post; hold for more reactions", reactionChoices: "Reaction choices",
@@ -42,7 +41,6 @@ const copy = {
 type CopyKey = keyof typeof copy.id;
 type PreferencesValue = {
   language: LanguagePreference; setLanguage: (value: LanguagePreference) => void;
-  theme: ThemePreference; setTheme: (value: ThemePreference) => void;
   locale: Locale; t: (key: CopyKey) => string;
 };
 
@@ -50,28 +48,20 @@ const PreferencesContext = createContext<PreferencesValue | null>(null);
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<LanguagePreference>("auto");
-  const [theme, setThemeState] = useState<ThemePreference>("system");
   const [deviceLocale, setDeviceLocale] = useState<Locale>("id");
 
   useEffect(() => {
     const savedLanguage = window.localStorage.getItem("mindcaster-language") as LanguagePreference | null;
-    const savedTheme = window.localStorage.getItem("mindcaster-theme") as ThemePreference | null;
     if (savedLanguage === "auto" || savedLanguage === "id" || savedLanguage === "en") setLanguageState(savedLanguage);
-    if (savedTheme === "system" || savedTheme === "light" || savedTheme === "dark") setThemeState(savedTheme);
     setDeviceLocale(window.navigator.language.toLowerCase().startsWith("id") ? "id" : "en");
   }, []);
 
+  // Appearance is fixed to the light theme; the previous light/dark toggle was removed.
   useEffect(() => {
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const apply = () => {
-      const dark = theme === "dark" || (theme === "system" && media.matches);
-      document.documentElement.classList.toggle("dark", dark);
-      document.documentElement.style.colorScheme = dark ? "dark" : "light";
-    };
-    apply();
-    media.addEventListener("change", apply);
-    return () => media.removeEventListener("change", apply);
-  }, [theme]);
+    document.documentElement.classList.remove("dark");
+    document.documentElement.style.colorScheme = "light";
+    window.localStorage.removeItem("mindcaster-theme");
+  }, []);
 
   const locale = language === "auto" ? deviceLocale : language;
   useEffect(() => { document.documentElement.lang = locale; }, [locale]);
@@ -79,11 +69,9 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   const value = useMemo<PreferencesValue>(() => ({
     language,
     setLanguage: (next) => { setLanguageState(next); window.localStorage.setItem("mindcaster-language", next); },
-    theme,
-    setTheme: (next) => { setThemeState(next); window.localStorage.setItem("mindcaster-theme", next); },
     locale,
     t: (key) => copy[locale][key],
-  }), [language, theme, locale]);
+  }), [language, locale]);
 
   return <PreferencesContext.Provider value={value}>{children}</PreferencesContext.Provider>;
 }
