@@ -42,7 +42,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
       let { data } = await supabase.from("profiles").select(cols).eq("id", user.id).maybeSingle();
       if (!data) {
         const meta = user.user_metadata ?? {};
-        const res = await supabase.from("profiles").insert({ id: user.id, display_name: meta.full_name ?? meta.name ?? user.email?.split("@")[0] ?? null, avatar_url: meta.avatar_url ?? meta.picture ?? null }).select(cols).maybeSingle();
+        const res = await supabase.from("profiles").insert({ id: user.id, display_name: meta["full_name"] ?? meta["name"] ?? user.email?.split("@")[0] ?? null, avatar_url: meta["avatar_url"] ?? meta["picture"] ?? null }).select(cols).maybeSingle();
         data = res.data;
       }
       setProfile(data as Profile | null);
