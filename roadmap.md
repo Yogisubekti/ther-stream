@@ -14,3 +14,6 @@
 - [ ] Verify signed-in browser flows — blocked until the requesting user signs in or identifies a test account
 - [ ] Move post usernames below names and add Follow controls
 - [ ] Add Indonesian/English language and light/dark appearance options
+- [x] Cloudflare R2 image uploads for posts and avatars (10 MB, JPG/PNG/WebP/GIF)
+- [x] FOMO page: Live Feed, Thesis, weekly PnL leaderboard with 20-key rotation
+- [ ] Scheduled database backup to R2
