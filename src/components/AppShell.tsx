@@ -9,6 +9,8 @@ import { AuthScreen } from "@/components/AuthScreen";
 import { Avatar } from "@/components/Avatar";
 import { BrandLogo } from "@/components/BrandLogo";
 import { supabase } from "@/integrations/supabase/client";
+import { FollowsProvider } from "@/lib/follows";
+import { usePreferences } from "@/lib/preferences";
 import type { Profile } from "@/lib/social";
 
 const NAV = [
@@ -20,6 +22,7 @@ const NAV = [
 ] as const;
 
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: (user: User) => ReactNode }) {
+  const { t } = usePreferences();
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [unread, setUnread] = useState(0);
@@ -55,13 +58,13 @@ export function AppShell({ title, actions, children }: { title: string; actions?
           <AuthScreen />
         </main>
       ) : (
-        <>
+        <FollowsProvider userId={user.id}>
           <header className="glass-panel sticky top-0 z-30 border-b border-surface/80">
             <div className="relative mx-auto flex h-14 max-w-[600px] items-center justify-between px-4">
               <Link to="/profile" search={{}} aria-label="Buka profil saya" className="rounded-full outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-ring">
                 <Avatar profile={profile} size={34} />
               </Link>
-              {title === "Home" ? <BrandLogo size={34} className="pointer-events-none absolute left-1/2 -translate-x-1/2" /> : <h1 className="absolute left-1/2 max-w-[55%] -translate-x-1/2 truncate font-display text-base font-semibold">{title}</h1>}
+              {title === "Home" ? <BrandLogo size={34} className="pointer-events-none absolute left-1/2 -translate-x-1/2" /> : <h1 className="absolute left-1/2 max-w-[55%] -translate-x-1/2 truncate font-display text-base font-semibold">{title === "Discover" ? t("discover") : title === "Notifikasi" ? t("notifications") : title === "Pesan" ? t("messages") : title === "Profil" ? t("profile") : title}</h1>}
               <div className="ml-auto">{actions}</div>
             </div>
           </header>
@@ -70,9 +73,10 @@ export function AppShell({ title, actions, children }: { title: string; actions?
             <ul className="mx-auto grid h-16 max-w-[600px] grid-cols-5">
               {NAV.map(({ to, label, ...rest }) => {
                 const Icon = "icon" in rest ? rest.icon : null;
+                const translatedLabel = label === "Home" ? t("home") : label === "Discover" ? t("discover") : label === "Notifikasi" ? t("notifications") : label === "Pesan" ? t("messages") : label;
                 return (
                   <li key={to}>
-                    <Link to={to} activeOptions={{ exact: true, includeSearch: false }} aria-label={label} title={label} className="group flex h-full items-center justify-center text-muted-foreground data-[status=active]:text-foreground">
+                    <Link to={to} activeOptions={{ exact: true, includeSearch: false }} aria-label={translatedLabel} title={translatedLabel} className="group flex h-full items-center justify-center text-muted-foreground data-[status=active]:text-foreground">
                       <span className="relative grid size-11 place-items-center rounded-full transition group-data-[status=active]:bg-primary/20">
                         {Icon ? (
                           <Icon className="size-[22px]" />
@@ -87,7 +91,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
               })}
             </ul>
           </nav>
-        </>
+        </FollowsProvider>
       )}
     </div>
   );

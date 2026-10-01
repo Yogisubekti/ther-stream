@@ -10,9 +10,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
+import { useFollows } from "@/lib/follows";
+import { usePreferences } from "@/lib/preferences";
 import { REACTIONS, displayName, handle, short, timeAgo, type Post } from "@/lib/social";
 
 export function PostCard({ post: p, userId, onChange, onError }: { post: Post; userId: string; onChange: () => void; onError: (m: string) => void }) {
+  const { following, pending, toggleFollow } = useFollows();
+  const { t } = usePreferences();
   const [showComments, setShowComments] = useState(false);
   const [showReact, setShowReact] = useState(false);
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -75,7 +79,7 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
       }
       onChange();
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Gagal memberi reaksi.");
+      onError(error instanceof Error ? error.message : t("reactionFailed"));
       onChange();
     } finally {
       reactionPending.current = false;
@@ -87,7 +91,7 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
       ? supabase.from("post_bookmarks").delete().eq("post_id", p.id).eq("user_id", userId)
       : supabase.from("post_bookmarks").insert({ post_id: p.id, user_id: userId }));
     if (error) return onError(error.message);
-    toast.success(bookmarked ? "Bookmark dihapus" : "Postingan disimpan");
+    toast.success(bookmarked ? t("bookmarkRemoved") : t("postSaved"));
     onChange();
   }
   async function addComment(e: FormEvent) {
@@ -103,13 +107,13 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
     const { error } = await supabase.from("posts").update({ content }).eq("id", p.id).eq("author_id", userId);
     if (error) return onError(error.message);
     setEditing(false);
-    toast.success("Postingan diperbarui");
+    toast.success(t("postUpdated"));
     onChange();
   }
   async function deletePost() {
     const { error } = await supabase.from("posts").delete().eq("id", p.id).eq("author_id", userId);
     if (error) return onError(error.message);
-    toast.success("Postingan dihapus");
+    toast.success(t("postDeleted"));
     onChange();
   }
   async function submitReport(e: FormEvent) {
@@ -117,7 +121,7 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
     const { error } = await supabase.from("post_reports").insert({ post_id: p.id, reporter_id: userId, reason });
     if (error) return onError(error.code === "23505" ? "Postingan ini sudah pernah Anda laporkan." : error.message);
     setReporting(false);
-    toast.success("Laporan terkirim", { description: "Terima kasih telah membantu menjaga komunitas." });
+    toast.success(t("reportSent"), { description: t("reportThanks") });
   }
 
   return (
@@ -125,47 +129,50 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
       <header className="flex items-start gap-3">
         <Link to="/profile" search={{ id: p.author_id }}><Avatar profile={p.author} /></Link>
         <div className="min-w-0 flex-1">
-          <Link to="/profile" search={{ id: p.author_id }} className="flex flex-wrap items-baseline gap-x-1.5">
-            <span className="font-display text-sm font-semibold">{displayName(p.author)}</span>
-            <IdentityBadges username={p.author?.username} />
-            {handle(p.author) && <span className="text-xs text-muted-foreground">{handle(p.author)}</span>}
-            <span className="text-xs text-muted-foreground">· {timeAgo(p.created_at)}</span>
-          </Link>
+          <div className="flex min-w-0 items-center gap-1.5">
+            <Link to="/profile" search={{ id: p.author_id }} className="flex min-w-0 items-center gap-1">
+              <span className="truncate font-display text-sm font-semibold">{displayName(p.author)}</span>
+              <IdentityBadges username={p.author?.username} />
+            </Link>
+            {p.author_id !== userId && <Button type="button" variant="ghost" size="sm" disabled={pending.has(p.author_id)} onClick={() => void toggleFollow(p.author_id)} className="h-6 shrink-0 px-1.5 text-xs font-semibold text-primary">· {following.has(p.author_id) ? t("following") : t("follow")}</Button>}
+            <span className="shrink-0 text-xs text-muted-foreground">· {timeAgo(p.created_at)}</span>
+          </div>
+          {handle(p.author) && <Link to="/profile" search={{ id: p.author_id }} className="block text-xs text-muted-foreground">{handle(p.author)}</Link>}
           {p.author?.wallet_address && <span className="text-[11px] text-primary">{short(p.author.wallet_address)}</span>}
           <p className="mt-1.5 whitespace-pre-wrap break-words text-sm">{p.content}</p>
         </div>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label="Menu postingan"><MoreHorizontal className="size-5" /></Button></DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t("postMenu")}><MoreHorizontal className="size-5" /></Button></DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
             {p.author_id === userId ? (
               <>
-                <DropdownMenuItem onSelect={() => { setEditContent(p.content); setEditing(true); }}><Pencil />Edit postingan</DropdownMenuItem>
-                <DropdownMenuItem onSelect={deletePost} className="text-destructive focus:text-destructive"><Trash2 />Hapus postingan</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => { setEditContent(p.content); setEditing(true); }}><Pencil />{t("editPost")}</DropdownMenuItem>
+                <DropdownMenuItem onSelect={deletePost} className="text-destructive focus:text-destructive"><Trash2 />{t("deletePost")}</DropdownMenuItem>
               </>
-            ) : <DropdownMenuItem onSelect={() => setReporting(true)} className="text-destructive focus:text-destructive"><Flag />Laporkan</DropdownMenuItem>}
+            ) : <DropdownMenuItem onSelect={() => setReporting(true)} className="text-destructive focus:text-destructive"><Flag />{t("report")}</DropdownMenuItem>}
           </DropdownMenuContent>
         </DropdownMenu>
       </header>
 
       <div className="relative mt-2 flex justify-between pl-[44px] text-muted-foreground">
-        <Button variant="ghost" size="sm" onClick={() => setShowComments((v) => !v)} aria-label="Komentar"><MessageCircle className="size-4" />{p.post_comments.length}</Button>
-        <Button variant="ghost" size="sm" onClick={toggleRepost} aria-pressed={reposted} aria-label="Repost" className={reposted ? "text-primary" : ""}><Repeat2 className="size-4" />{p.post_reposts.length}</Button>
+        <Button variant="ghost" size="sm" onClick={() => setShowComments((v) => !v)} aria-label={t("comments")}><MessageCircle className="size-4" />{p.post_comments.length}</Button>
+        <Button variant="ghost" size="sm" onClick={toggleRepost} aria-pressed={reposted} aria-label={t("repost")} className={reposted ? "text-primary" : ""}><Repeat2 className="size-4" />{p.post_reposts.length}</Button>
         <Popover open={showReact} onOpenChange={setShowReact}>
           <div className="flex items-center">
             <PopoverAnchor asChild>
-              <Button variant="ghost" size="sm" onPointerDown={startPress} onPointerMove={movePress} onPointerUp={clearPress} onPointerCancel={clearPress} onPointerLeave={clearPress} onContextMenu={(e) => e.preventDefault()} onClick={() => { if (longPressed.current) { longPressed.current = false; return; } void chooseReaction(null); }} aria-pressed={liked || Boolean(myReaction)} aria-label="Suka postingan; tahan untuk pilihan reaksi" className={liked || myReaction ? "text-primary touch-manipulation" : "touch-manipulation"}>
+              <Button variant="ghost" size="sm" onPointerDown={startPress} onPointerMove={movePress} onPointerUp={clearPress} onPointerCancel={clearPress} onPointerLeave={clearPress} onContextMenu={(e) => e.preventDefault()} onClick={() => { if (longPressed.current) { longPressed.current = false; return; } void chooseReaction(null); }} aria-pressed={liked || Boolean(myReaction)} aria-label={t("likePost")} className={liked || myReaction ? "text-primary touch-manipulation" : "touch-manipulation"}>
                 {myReaction ? <span className="text-base leading-none" aria-hidden="true">{myReaction}</span> : <Heart className={`size-4 ${liked ? "fill-primary" : ""}`} />}
                 {totalReactions}
               </Button>
             </PopoverAnchor>
-            <Button variant="ghost" size="icon" className="size-6" aria-label="Pilihan reaksi" aria-expanded={showReact} onClick={() => setShowReact((open) => !open)}><ChevronDown className="size-3.5" /></Button>
+            <Button variant="ghost" size="icon" className="size-6" aria-label={t("reactionChoices")} aria-expanded={showReact} onClick={() => setShowReact((open) => !open)}><ChevronDown className="size-3.5" /></Button>
           </div>
           <PopoverContent side="top" align="center" sideOffset={8} className="flex w-auto max-w-[calc(100vw-1rem)] items-center gap-0.5 rounded-full border-border bg-popover p-1.5 shadow-tab">
-            <Button type="button" variant="ghost" size="icon" className={liked ? "size-9 text-primary" : "size-9"} aria-label="Suka" aria-pressed={liked} onClick={() => void chooseReaction(null)}><Heart className={`size-5 ${liked ? "fill-primary" : ""}`} /></Button>
+            <Button type="button" variant="ghost" size="icon" className={liked ? "size-9 text-primary" : "size-9"} aria-label={t("like")} aria-pressed={liked} onClick={() => void chooseReaction(null)}><Heart className={`size-5 ${liked ? "fill-primary" : ""}`} /></Button>
             {REACTIONS.map((emoji) => <Button type="button" variant="ghost" size="icon" key={emoji} className={myReaction === emoji ? "size-9 bg-accent text-lg" : "size-9 text-lg"} aria-label={`Reaksi ${emoji}`} aria-pressed={myReaction === emoji} onClick={() => void chooseReaction(emoji)}>{emoji}</Button>)}
           </PopoverContent>
         </Popover>
-        <Button variant="ghost" size="icon" className={bookmarked ? "text-primary" : ""} onClick={toggleBookmark} aria-pressed={bookmarked} aria-label={bookmarked ? "Hapus bookmark" : "Bookmark"}><Bookmark className={`size-4 ${bookmarked ? "fill-primary" : ""}`} /></Button>
+        <Button variant="ghost" size="icon" className={bookmarked ? "text-primary" : ""} onClick={toggleBookmark} aria-pressed={bookmarked} aria-label={bookmarked ? t("removeBookmark") : t("bookmark")}><Bookmark className={`size-4 ${bookmarked ? "fill-primary" : ""}`} /></Button>
       </div>
 
       {showComments && (
@@ -174,12 +181,12 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
             <div key={c.id} className="flex items-start gap-2 text-sm">
               <Avatar profile={c.author} size={28} />
               <p className="flex-1 break-words"><span className="inline-flex items-center gap-1 font-semibold">{displayName(c.author)}<IdentityBadges username={c.author?.username} /></span> {c.content}</p>
-              {c.author_id === userId && <Button variant="ghost" size="icon" className="size-7" aria-label="Hapus komentar" onClick={() => run(supabase.from("post_comments").delete().eq("id", c.id))}><Trash2 className="size-3.5" /></Button>}
+               {c.author_id === userId && <Button variant="ghost" size="icon" className="size-7" aria-label={t("deleteComment")} onClick={() => run(supabase.from("post_comments").delete().eq("id", c.id))}><Trash2 className="size-3.5" /></Button>}
             </div>
           ))}
           <form onSubmit={addComment} className="flex gap-2">
-            <input value={comment} onChange={(e) => setComment(e.target.value)} maxLength={300} placeholder="Tulis komentar…" className="h-9 flex-1 rounded-xl border border-border/60 bg-surface/75 px-3 text-sm outline-none focus:border-primary" />
-            <Button type="submit" size="sm" disabled={!comment.trim()}>Balas</Button>
+            <input value={comment} onChange={(e) => setComment(e.target.value)} maxLength={300} placeholder={t("writeComment")} className="h-9 flex-1 rounded-xl border border-border/60 bg-surface/75 px-3 text-sm outline-none focus:border-primary" />
+            <Button type="submit" size="sm" disabled={!comment.trim()}>{t("reply")}</Button>
           </form>
         </div>
       )}
@@ -187,9 +194,9 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
       <Dialog open={editing} onOpenChange={setEditing}>
         <DialogContent className="w-[calc(100%-2rem)] rounded-2xl sm:max-w-md">
           <form onSubmit={saveEdit} className="space-y-4">
-            <DialogHeader><DialogTitle>Edit postingan</DialogTitle><DialogDescription>Perbarui isi postingan Anda.</DialogDescription></DialogHeader>
+            <DialogHeader><DialogTitle>{t("editPost")}</DialogTitle><DialogDescription>{t("updatePost")}</DialogDescription></DialogHeader>
             <textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} maxLength={500} rows={5} autoFocus className="w-full resize-none rounded-xl border border-border bg-surface p-3 text-sm outline-none focus:border-primary" />
-            <div className="flex items-center justify-between"><span className="text-xs text-muted-foreground">{editContent.length}/500</span><DialogFooter className="flex-row gap-2"><Button type="button" variant="ghost" size="sm" onClick={() => setEditing(false)}>Batal</Button><Button type="submit" size="sm" disabled={!editContent.trim()}>Simpan</Button></DialogFooter></div>
+             <div className="flex items-center justify-between"><span className="text-xs text-muted-foreground">{editContent.length}/500</span><DialogFooter className="flex-row gap-2"><Button type="button" variant="ghost" size="sm" onClick={() => setEditing(false)}>{t("cancel")}</Button><Button type="submit" size="sm" disabled={!editContent.trim()}>{t("save")}</Button></DialogFooter></div>
           </form>
         </DialogContent>
       </Dialog>
@@ -197,13 +204,13 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
       <Dialog open={reporting} onOpenChange={setReporting}>
         <DialogContent className="w-[calc(100%-2rem)] rounded-2xl sm:max-w-md">
           <form onSubmit={submitReport} className="space-y-4">
-            <DialogHeader><DialogTitle>Laporkan postingan</DialogTitle><DialogDescription>Pilih alasan yang paling sesuai. Laporan Anda bersifat privat.</DialogDescription></DialogHeader>
-            <label className="block text-sm font-semibold">Alasan
+            <DialogHeader><DialogTitle>{t("reportPost")}</DialogTitle><DialogDescription>{t("reportPrivate")}</DialogDescription></DialogHeader>
+            <label className="block text-sm font-semibold">{t("reason")}
               <select value={reason} onChange={(e) => setReason(e.target.value)} className="mt-2 h-11 w-full rounded-xl border border-border bg-surface px-3 font-normal outline-none focus:border-primary">
-                <option value="spam">Spam</option><option value="harassment">Pelecehan</option><option value="misinformation">Informasi menyesatkan</option><option value="illegal">Konten ilegal</option><option value="other">Lainnya</option>
+                 <option value="spam">{t("spam")}</option><option value="harassment">{t("harassment")}</option><option value="misinformation">{t("misinformation")}</option><option value="illegal">{t("illegal")}</option><option value="other">{t("other")}</option>
               </select>
             </label>
-            <DialogFooter className="flex-row justify-end gap-2"><Button type="button" variant="ghost" size="sm" onClick={() => setReporting(false)}>Batal</Button><Button type="submit" variant="destructive" size="sm">Kirim laporan</Button></DialogFooter>
+             <DialogFooter className="flex-row justify-end gap-2"><Button type="button" variant="ghost" size="sm" onClick={() => setReporting(false)}>{t("cancel")}</Button><Button type="submit" variant="destructive" size="sm">{t("sendReport")}</Button></DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
