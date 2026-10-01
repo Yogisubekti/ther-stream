@@ -47,8 +47,8 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
 
   const cur = open ? groups[open.g]?.items[open.i] : null;
   const next = () => {
-    if (!open) return;
-    const g = groups[open.g];
+    if (!open || !groups[open.g]) return;
+    const g = groups[open.g]!;
     if (open.i + 1 < g.items.length) setOpen({ g: open.g, i: open.i + 1 });
     else if (open.g + 1 < groups.length) setOpen({ g: open.g + 1, i: 0 });
     else setOpen(null);
@@ -56,8 +56,8 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
 
   useEffect(() => {
     if (!cur || cur.media_type !== "image") return;
-    const t = setTimeout(next, 5000);
-    return () => clearTimeout(t);
+    const timer = setTimeout(next, 5000);
+    return () => clearTimeout(timer);
   });
 
   return (
@@ -79,11 +79,11 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
       {cur && open && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90">
           <div className="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-[600px] gap-1 px-3 pt-3">
-            {groups[open.g].items.map((s, i) => <span key={s.id} className={`h-1 flex-1 rounded-full ${i <= open.i ? "bg-background" : "bg-background/30"}`} />)}
+            {groups[open.g]!.items.map((s, i) => <span key={s.id} className={`h-1 flex-1 rounded-full ${i <= open.i ? "bg-background" : "bg-background/30"}`} />)}
           </div>
           <div className="absolute inset-x-0 top-5 z-10 mx-auto flex max-w-[600px] items-center gap-2 px-3 text-background">
-            <Avatar profile={groups[open.g].author} size={32} />
-            <span className="text-sm font-semibold">{displayName(groups[open.g].author)}</span>
+            <Avatar profile={groups[open.g]!.author} size={32} />
+            <span className="text-sm font-semibold">{displayName(groups[open.g]!.author)}</span>
             <span className="text-xs opacity-70">{timeAgo(cur.created_at)}</span>
             <span className="ml-auto flex gap-1">
               {cur.author_id === userId && <button aria-label="Hapus story" onClick={() => { if (confirm("Hapus story ini?")) void remove(cur.id); }} className="grid size-9 place-items-center rounded-full hover:bg-background/20"><Trash2 className="size-5" /></button>}
