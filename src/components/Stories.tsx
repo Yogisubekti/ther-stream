@@ -54,6 +54,12 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
     else setOpen(null);
   };
 
+  useEffect(() => {
+    if (!cur || cur.media_type !== "image") return;
+    const t = setTimeout(next, 5000);
+    return () => clearTimeout(t);
+  });
+
   return (
     <>
       <section aria-label="Story" className="glass-panel flex gap-3 overflow-x-auto rounded-[24px] border border-surface/80 p-3">
@@ -86,7 +92,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
           </div>
           {cur.media_type === "video"
             ? <video key={cur.id} src={cur.media_url} autoPlay playsInline onEnded={next} className="max-h-full max-w-full" />
-            : <img key={cur.id} src={cur.media_url} alt="Story" onLoad={() => { const id = cur.id; setTimeout(() => setOpen((o) => (o && groups[o.g]?.items[o.i]?.id === id ? (next(), o) : o)), 5000); }} className="max-h-full max-w-full object-contain" />}
+            : <img key={cur.id} src={cur.media_url} alt="Story" className="max-h-full max-w-full object-contain" />}
           <button aria-label="Berikutnya" onClick={next} className="absolute inset-y-20 right-0 w-1/2" />
           <button aria-label="Sebelumnya" onClick={() => setOpen(open.i > 0 ? { g: open.g, i: open.i - 1 } : open.g > 0 ? { g: open.g - 1, i: 0 } : open)} className="absolute inset-y-20 left-0 w-1/2" />
         </div>

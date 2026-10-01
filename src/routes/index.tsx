@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
 import { PostCard } from "@/components/PostCard";
+import { Stories } from "@/components/Stories";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { uploadImage } from "@/lib/upload";
@@ -99,6 +100,7 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
           {posts.map((p) => <PostCard key={p.id} post={p} userId={user.id} onChange={load} onError={setError} />)}
         </>
       ) : <>
+      <Stories userId={user.id} onError={setError} />
       <form onSubmit={createPost} className="glass-panel rounded-[24px] border border-surface/80 p-4">
         <textarea value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={500} rows={3} placeholder={t("whatsHappening")} className="w-full resize-none rounded-xl border border-border/60 bg-surface/75 p-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/25" />
         {image && <div className="relative mt-2"><img src={URL.createObjectURL(image)} alt="Pratinjau" className="max-h-60 w-full rounded-xl object-cover" /><button type="button" onClick={() => setImage(null)} aria-label="Hapus gambar" className="absolute right-2 top-2 rounded-full bg-background/80 px-2 text-sm">✕</button></div>}
