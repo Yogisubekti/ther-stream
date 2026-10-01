@@ -37,7 +37,16 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   useEffect(() => {
     if (!user) return;
     void supabase.from("notifications").select("id", { count: "exact", head: true }).eq("read", false).then(({ count }) => setUnread(count ?? 0));
-    void supabase.from("profiles").select("id, display_name, username, bio, avatar_url, wallet_address, created_at").eq("id", user.id).maybeSingle().then(({ data }) => setProfile(data as Profile | null));
+    const cols = "id, display_name, username, bio, avatar_url, wallet_address, created_at";
+    void (async () => {
+      let { data } = await supabase.from("profiles").select(cols).eq("id", user.id).maybeSingle();
+      if (!data) {
+        const meta = user.user_metadata ?? {};
+        const res = await supabase.from("profiles").insert({ id: user.id, display_name: meta.full_name ?? meta.name ?? user.email?.split("@")[0] ?? null, avatar_url: meta.avatar_url ?? meta.picture ?? null }).select(cols).maybeSingle();
+        data = res.data;
+      }
+      setProfile(data as Profile | null);
+    })();
   }, [user]);
 
   return (
