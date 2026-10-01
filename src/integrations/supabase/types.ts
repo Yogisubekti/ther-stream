@@ -395,6 +395,41 @@ export type Database = {
         }
         Relationships: []
       }
+      stories: {
+        Row: {
+          author_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          media_type: string
+          media_url: string
+        }
+        Insert: {
+          author_id: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          media_type: string
+          media_url: string
+        }
+        Update: {
+          author_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          media_type?: string
+          media_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stories_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_follows: {
         Row: {
           created_at: string
