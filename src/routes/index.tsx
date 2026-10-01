@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { BadgeCheck, Bookmark, Check, Languages, Menu, Moon, ImagePlus, Send, Sun, Users, UserRoundPlus } from "lucide-react";
+import { BadgeCheck, Bookmark, Check, Languages, Menu, ImagePlus, Send, Users, UserRoundPlus } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { uploadImage } from "@/lib/upload";
 import { supabase } from "@/integrations/supabase/client";
-import { usePreferences, type LanguagePreference, type ThemePreference } from "@/lib/preferences";
+import { usePreferences, type LanguagePreference } from "@/lib/preferences";
 import { fetchPosts, type Post } from "@/lib/social";
 
 export const Route = createFileRoute("/")({
@@ -29,14 +29,11 @@ export const Route = createFileRoute("/")({
 type HomeView = "home" | "bookmarks" | "groups";
 
 function HomeRoute() {
-  const { language, setLanguage, theme, setTheme, t } = usePreferences();
+  const { language, setLanguage, t } = usePreferences();
   const [view, setView] = useState<HomeView>("home");
   const title = view === "bookmarks" ? t("bookmarks") : view === "groups" ? t("groups") : "Home";
   const languageOptions: { value: LanguagePreference; label: string }[] = [
     { value: "auto", label: t("automatic") }, { value: "id", label: t("indonesian") }, { value: "en", label: t("english") },
-  ];
-  const themeOptions: { value: ThemePreference; label: string }[] = [
-    { value: "system", label: t("system") }, { value: "light", label: t("light") }, { value: "dark", label: t("dark") },
   ];
   const actions = (
     <DropdownMenu>
@@ -50,9 +47,6 @@ function HomeRoute() {
         <DropdownMenuSeparator />
         <div className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground"><Languages className="mr-1.5 inline size-3.5" />{t("language")}</div>
         {languageOptions.map((option) => <DropdownMenuItem key={option.value} onSelect={() => setLanguage(option.value)} className="pl-7">{option.label}{language === option.value && <Check className="ml-auto size-4" />}</DropdownMenuItem>)}
-        <DropdownMenuSeparator />
-        <div className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground">{theme === "dark" ? <Moon className="mr-1.5 inline size-3.5" /> : <Sun className="mr-1.5 inline size-3.5" />}{t("appearance")}</div>
-        {themeOptions.map((option) => <DropdownMenuItem key={option.value} onSelect={() => setTheme(option.value)} className="pl-7">{option.label}{theme === option.value && <Check className="ml-auto size-4" />}</DropdownMenuItem>)}
       </DropdownMenuContent>
     </DropdownMenu>
   );
