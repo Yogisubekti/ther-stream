@@ -53,7 +53,7 @@ function FollowList({ profileId, userId, tab, setTab, onNavigate }: { profileId:
     const [mine, other] = tab === "following" ? ["follower_id", "followed_id"] as const : ["followed_id", "follower_id"] as const;
     void (async () => {
       const { data } = await supabase.from("user_follows").select(other).eq(mine, profileId).order("created_at", { ascending: false }).limit(200);
-      const ids = (data ?? []).map((r) => (r as Record<string, string>)[other]);
+      const ids = (data ?? []).map((r) => (r as Record<string, string>)[other]).filter((x): x is string => !!x);
       if (!ids.length) return setPeople([]);
       const { data: profs } = await supabase.from("profiles").select(COLS).in("id", ids);
       const byId = new Map((profs ?? []).map((p) => [p.id, p as Profile]));
