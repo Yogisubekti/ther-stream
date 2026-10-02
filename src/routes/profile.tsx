@@ -8,6 +8,7 @@ import type { User } from "@supabase/supabase-js";
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
 import { IdentityBadges } from "@/components/IdentityBadges";
+import { FollowStats, ProfileFollowButton } from "@/components/FollowLists";
 import { PostCard } from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
 import { uploadImage } from "@/lib/upload";
@@ -95,7 +96,10 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
                   <Button variant="ghost" size="icon" aria-label="Keluar" onClick={() => supabase.auth.signOut()}><LogOut className="size-4" /></Button>
                 </>
               ) : (
-                <Button asChild variant="surface" size="sm"><Link to="/messages" search={{ with: profile.id }}><Mail className="size-4" />Pesan</Link></Button>
+                <>
+                  <ProfileFollowButton profileId={profile.id} />
+                  <Button asChild variant="surface" size="sm"><Link to="/messages" search={{ with: profile.id }}><Mail className="size-4" />Pesan</Link></Button>
+                </>
               )}
             </div>
           </div>
@@ -107,6 +111,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
             {profile.wallet_address ? <span className="flex items-center gap-1 text-primary"><WalletCards className="size-3.5" />{short(profile.wallet_address)} terverifikasi</span>
               : isMe && <button onClick={connectWallet} className="flex items-center gap-1 font-semibold text-link"><WalletCards className="size-3.5" />Hubungkan MetaMask</button>}
           </div>
+          <FollowStats profileId={profile.id} userId={user.id} />
         </div>
       </section>
 
