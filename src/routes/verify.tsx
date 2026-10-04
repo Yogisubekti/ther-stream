@@ -62,8 +62,8 @@ function VerifyPage({ userId }: { userId: string }) {
 
   async function pay(): Promise<void> {
     const eth = (window as unknown as { ethereum?: Eth }).ethereum;
-    if (!eth) return toast.error("MetaMask tidak terdeteksi.");
-    if (!wallet) return toast.error("Hubungkan dompet di profil terlebih dahulu.");
+    if (!eth) { toast.error("MetaMask tidak terdeteksi."); return; }
+    if (!wallet) { toast.error("Hubungkan dompet di profil terlebih dahulu."); return; }
     const c = CHAINS[chain]; const t = c.tokens[token];
     try {
       setStep("Menghubungkan dompet…");
