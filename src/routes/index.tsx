@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { BadgeCheck, Bookmark, Check, Languages, Menu, ImagePlus, Send, Users, UserRoundPlus } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
@@ -42,7 +42,7 @@ function HomeRoute() {
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuItem onSelect={() => setView("groups")}><Users />{t("groups")}</DropdownMenuItem>
         <DropdownMenuItem disabled><UserRoundPlus />{t("createGroup")} <span className="ml-auto text-[10px] font-semibold text-muted-foreground">{t("soon")}</span></DropdownMenuItem>
-        <DropdownMenuItem disabled><BadgeCheck />{t("verifyAccount")} <span className="ml-auto text-[10px] font-semibold text-muted-foreground">{t("soon")}</span></DropdownMenuItem>
+        <DropdownMenuItem asChild><Link to="/verify"><BadgeCheck />{t("verifyAccount")}</Link></DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => setView("bookmarks")}><Bookmark />{t("bookmarks")}</DropdownMenuItem>
         <DropdownMenuSeparator />
