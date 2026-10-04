@@ -8,6 +8,7 @@ import { PostCard } from "@/components/PostCard";
 import { Stories } from "@/components/Stories";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { TelegramLogo, XLogo } from "@/components/SocialLogos";
 import { uploadImage } from "@/lib/upload";
 import { supabase } from "@/integrations/supabase/client";
 import { usePreferences, type LanguagePreference } from "@/lib/preferences";
@@ -45,6 +46,9 @@ function HomeRoute() {
         <DropdownMenuItem asChild><Link to="/verify"><BadgeCheck />{t("verifyAccount")}</Link></DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => setView("bookmarks")}><Bookmark />{t("bookmarks")}</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild><a href="https://x.com/Mindcaster_xyz" target="_blank" rel="noreferrer"><XLogo className="size-4" />X (Twitter)</a></DropdownMenuItem>
+        <DropdownMenuItem asChild><a href="https://t.me/MindcastApp" target="_blank" rel="noreferrer"><TelegramLogo className="size-4" />Telegram</a></DropdownMenuItem>
         <DropdownMenuSeparator />
         <div className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground"><Languages className="mr-1.5 inline size-3.5" />{t("language")}</div>
         {languageOptions.map((option) => <DropdownMenuItem key={option.value} onSelect={() => setLanguage(option.value)} className="pl-7">{option.label}{language === option.value && <Check className="ml-auto size-4" />}</DropdownMenuItem>)}
