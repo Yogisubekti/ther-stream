@@ -61,7 +61,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
               <span className="signal-ring signal-ring-delay-2 absolute inset-0 rounded-full border border-primary/40" />
                 <BrandLogo size={44} className="relative shadow-signal" />
             </div>
-            <h1 className="font-display text-[22px] font-semibold leading-tight">Mindcaster</h1>
+            <h1 className="font-display text-[22px] font-semibold leading-tight">Mindcaster <span className="ml-1 inline-block align-middle rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">Beta akses</span></h1>
             <p className="mt-1 text-sm font-medium text-muted-foreground">Join the conversation</p>
           </header>
           <AuthScreen />

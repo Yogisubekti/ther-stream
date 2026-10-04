@@ -72,6 +72,14 @@ export function AuthScreen() {
         <span className="h-px flex-1 bg-border" />or continue with<span className="h-px flex-1 bg-border" />
       </div>
       <Button type="button" variant="surface" className="w-full" disabled={isLoading} onClick={handleGoogleSignIn}><span className="font-display text-base font-semibold leading-none">G</span>Continue with Google</Button>
+      <div className="mt-3 flex items-center justify-center gap-3">
+        <a href="https://x.com/Mindcaster_xyz" target="_blank" rel="noreferrer" aria-label="Mindcaster di X" title="Mindcaster di X" className="flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-border/60 bg-surface/75 text-sm font-semibold text-foreground transition hover:border-primary/60 hover:text-primary">
+          <XLogo className="size-4" />X
+        </a>
+        <a href="https://t.me/MindcastApp" target="_blank" rel="noreferrer" aria-label="Telegram Mindcaster" title="Telegram Mindcaster" className="flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-border/60 bg-surface/75 text-sm font-semibold text-foreground transition hover:border-primary/60 hover:text-primary">
+          <TelegramLogo className="size-4" />Telegram
+        </a>
+      </div>
       <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
         By joining you agree to the <a href="#terms" className="font-semibold text-link underline underline-offset-2">Terms</a> and <a href="#privacy" className="font-semibold text-link underline underline-offset-2">Privacy Policy</a>.
       </p>
