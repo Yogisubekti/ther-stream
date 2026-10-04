@@ -60,7 +60,7 @@ function VerifyPage({ userId }: { userId: string }) {
   const promoOff = !!badge?.promo_used || (slots ? slots.used >= slots.limit : false);
   useEffect(() => { if (promoOff && plan === "promo") setPlan("monthly"); }, [promoOff, plan]);
 
-  async function pay() {
+  async function pay(): Promise<void> {
     const eth = (window as unknown as { ethereum?: Eth }).ethereum;
     if (!eth) return toast.error("MetaMask tidak terdeteksi.");
     if (!wallet) return toast.error("Hubungkan dompet di profil terlebih dahulu.");
