@@ -11,7 +11,7 @@
 
 - Use Lovable Cloud authentication and private per-user profiles for persistent accounts; the user explicitly requested real database-backed accounts.
 - Store bookmarks and post reports as private per-user records protected by database access rules, so saved content and reports cannot leak between accounts.
-- Treat ybs, thorvox, and mindcaster as curated verified accounts in presentation code until account verification becomes database-managed.
+- Verification badges come from verified_badges (server writes only, after on-chain ERC20 payment checks); ybs, thorvox, mindcaster stay curated in presentation code.
 - Store user language and appearance preferences locally so display choices apply immediately without profile writes.
 - Keep follow relationships in the user_follows table with authenticated row-level access; follows must persist across sessions.
 - Media uploads go browser→R2 via short-lived signed URLs from a server function; R2 keys never reach the browser.

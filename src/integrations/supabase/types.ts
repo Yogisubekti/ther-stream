@@ -463,6 +463,85 @@ export type Database = {
           },
         ]
       }
+      verification_payments: {
+        Row: {
+          amount_usd: number
+          chain: string
+          created_at: string
+          expires_at: string
+          id: string
+          plan: string
+          starts_at: string
+          token: string
+          tx_hash: string
+          user_id: string
+        }
+        Insert: {
+          amount_usd: number
+          chain: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          plan: string
+          starts_at?: string
+          token: string
+          tx_hash: string
+          user_id: string
+        }
+        Update: {
+          amount_usd?: number
+          chain?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          plan?: string
+          starts_at?: string
+          token?: string
+          tx_hash?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verified_badges: {
+        Row: {
+          og: boolean
+          promo_used: boolean
+          updated_at: string
+          user_id: string
+          verified_until: string
+        }
+        Insert: {
+          og?: boolean
+          promo_used?: boolean
+          updated_at?: string
+          user_id: string
+          verified_until: string
+        }
+        Update: {
+          og?: boolean
+          promo_used?: boolean
+          updated_at?: string
+          user_id?: string
+          verified_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verified_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
