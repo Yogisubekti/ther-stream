@@ -2,7 +2,6 @@ import { Eye, EyeOff, Mail } from "lucide-react";
 import { useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
-import { TelegramLogo, XLogo } from "@/components/SocialLogos";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 
