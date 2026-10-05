@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { BadgeCheck, Bookmark, Check, Languages, Menu, ImagePlus, Send, Users, UserRoundPlus } from "lucide-react";
+import { BadgeCheck, Bookmark, Check, CircleHelp, Languages, Menu, ImagePlus, Send, Users, UserRoundPlus } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
@@ -17,9 +17,9 @@ import { fetchPosts, type Post } from "@/lib/social";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Mindcaster — Join the conversation" },
+      { title: "Mindcaster — Where Ideas Become Onchain" },
       { name: "description", content: "Mindcaster: social chain untuk posting, like, react, komentar, dan repost bersama komunitas Web3." },
-      { property: "og:title", content: "Mindcaster — Join the conversation" },
+      { property: "og:title", content: "Mindcaster — Where Ideas Become Onchain" },
       { property: "og:description", content: "Social chain untuk posting, like, react, komentar, dan repost bersama komunitas Web3." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -46,6 +46,7 @@ function HomeRoute() {
         <DropdownMenuItem asChild><Link to="/verify"><BadgeCheck />{t("verifyAccount")}</Link></DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => setView("bookmarks")}><Bookmark />{t("bookmarks")}</DropdownMenuItem>
+        <DropdownMenuItem asChild><Link to="/support"><CircleHelp />{t("supportCenter")}</Link></DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild><a href="https://x.com/Mindcaster_xyz" target="_blank" rel="noreferrer"><XLogo className="size-4" />X (Twitter)</a></DropdownMenuItem>
         <DropdownMenuItem asChild><a href="https://t.me/MindcastApp" target="_blank" rel="noreferrer"><TelegramLogo className="size-4" />Telegram</a></DropdownMenuItem>

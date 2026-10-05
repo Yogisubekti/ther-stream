@@ -73,7 +73,7 @@ export function AuthScreen() {
       </div>
       <Button type="button" variant="surface" className="w-full" disabled={isLoading} onClick={handleGoogleSignIn}><span className="font-display text-base font-semibold leading-none">G</span>Continue with Google</Button>
       <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
-        By joining you agree to the <a href="#terms" className="font-semibold text-link underline underline-offset-2">Terms</a> and <a href="#privacy" className="font-semibold text-link underline underline-offset-2">Privacy Policy</a>.
+        By joining you agree to the <a href="/support" className="font-semibold text-link underline underline-offset-2">Terms</a> and <a href="/support" className="font-semibold text-link underline underline-offset-2">Privacy Policy</a>.
       </p>
     </section>
   );

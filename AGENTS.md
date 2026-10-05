@@ -16,3 +16,4 @@
 - Keep follow relationships in the user_follows table with authenticated row-level access; follows must persist across sessions.
 - Media uploads go browser→R2 via short-lived signed URLs from a server function; R2 keys never reach the browser.
 - FOMO API calls run server-side through one key pool that rotates keys and pauses ones that hit limits, with short in-memory caching.
+- Keep help, safety, community, and legal information on the dedicated `/support` route so it remains shareable and easy to find.
