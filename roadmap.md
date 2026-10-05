@@ -19,3 +19,4 @@
 - [x] Crypto-paid verification (Base/Polygon/BNB, USDC/USDT) + OG badge
 - [ ] Robinhood Chain USDG payment — needs token contract details
 - [ ] Scheduled database backup to R2
+- [x] Add a dedicated Support & About page with private issue reports
