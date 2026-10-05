@@ -18,7 +18,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { usePreferences } from "@/lib/preferences";
 
 export const Route = createFileRoute("/support")({
   head: () => ({
@@ -81,7 +80,6 @@ function InfoBody({ items }: { items: string[] }) {
 }
 
 function SupportPage({ userId }: { userId: string }) {
-  const { locale } = usePreferences();
   const [panel, setPanel] = useState<Panel>(null);
   const [category, setCategory] = useState("bug");
   const [subject, setSubject] = useState("");
