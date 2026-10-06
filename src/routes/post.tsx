@@ -26,7 +26,7 @@ function PostRoute() {
   return <AppShell title="Postingan">{(u) => <PostView userId={u.id} id={id} />}</AppShell>;
 }
 
-function PostView({ userId, id }: { userId: string; id?: string }) {
+function PostView({ userId, id }: { userId: string; id: string | undefined }) {
   const [post, setPost] = useState<Post | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const load = useCallback(async () => {
