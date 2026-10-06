@@ -51,6 +51,7 @@ function Discover({ user }: { user: User }) {
 
   return (
     <>
+      <DiscoverBanners />
       <label className="relative block">
         <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari nama atau @username" className="glass-panel h-11 w-full rounded-full border border-surface/80 pl-10 pr-4 text-sm outline-none focus:border-primary" />
