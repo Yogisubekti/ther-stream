@@ -21,8 +21,8 @@ export const createUploadUrl = createServerFn({ method: "POST" })
     const accountId = process.env["CLOUDFLARE_R2_ACCOUNT_ID"];
     const accessKeyId = process.env["CLOUDFLARE_R2_ACCESS_KEY_ID"];
     const secretAccessKey = process.env["CLOUDFLARE_R2_SECRET_ACCESS_KEY"];
-    const bucket = process.env["CLOUDFLARE_R2_BUCKET_NAME"];
-    const publicUrl = process.env["CLOUDFLARE_R2_PUBLIC_URL"];
+    const bucket = process.env["CLOUDFLARE_R2_BUCKET_NAME"]?.trim().toLowerCase();
+    const publicUrl = process.env["CLOUDFLARE_R2_PUBLIC_URL"]?.trim();
     if (!accountId || !accessKeyId || !secretAccessKey || !bucket || !publicUrl) throw new Error("Penyimpanan belum dikonfigurasi.");
     const { AwsClient } = await import("aws4fetch");
     const client = new AwsClient({ accessKeyId, secretAccessKey, service: "s3", region: "auto" });

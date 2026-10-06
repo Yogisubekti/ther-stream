@@ -17,15 +17,26 @@ export const exchangePrivyToken = createServerFn({ method: "POST" })
     const did = payload.sub;
     if (!did) throw new Error("Token Privy tidak valid.");
 
-    const res = await fetch(`https://auth.privy.io/api/v1/users/${encodeURIComponent(did)}`, {
-      headers: { Authorization: `Basic ${btoa(`${PRIVY_APP_ID}:${secret}`)}`, "privy-app-id": PRIVY_APP_ID },
-    });
-    if (!res.ok) throw new Error("Gagal membaca akun Privy.");
-    const user = (await res.json()) as { linked_accounts?: LinkedAccount[] };
-    const accounts = user.linked_accounts ?? [];
+    const fetchAccounts = async () => {
+      const res = await fetch(`https://auth.privy.io/api/v1/users/${encodeURIComponent(did)}`, {
+        headers: { Authorization: `Basic ${btoa(`${PRIVY_APP_ID}:${secret}`)}`, "privy-app-id": PRIVY_APP_ID },
+      });
+      if (!res.ok) throw new Error("Gagal membaca akun Privy.");
+      const user = (await res.json()) as { linked_accounts?: LinkedAccount[] };
+      return user.linked_accounts ?? [];
+    };
+    const findWallet = (list: LinkedAccount[]) =>
+      list.find((a) => a.type === "wallet" && a.chain_type === "ethereum" && (a.wallet_client_type === "privy" || !a.wallet_client_type))?.address?.toLowerCase()
+      ?? list.find((a) => a.type === "wallet" && a.chain_type === "ethereum")?.address?.toLowerCase();
+    let accounts = await fetchAccounts();
+    // Embedded wallets are created right after login; wait briefly for it to appear.
+    for (let i = 0; i < 4 && !findWallet(accounts); i++) {
+      await new Promise((r) => setTimeout(r, 1500));
+      accounts = await fetchAccounts();
+    }
     const email = (accounts.find((a) => a.type === "email")?.address ?? accounts.find((a) => a.type === "google_oauth")?.email)?.toLowerCase();
     if (!email) throw new Error("Akun Privy perlu email atau Google.");
-    const wallet = accounts.find((a) => a.type === "wallet" && a.wallet_client_type === "privy" && a.chain_type === "ethereum")?.address?.toLowerCase();
+    const wallet = findWallet(accounts);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.auth.admin.createUser({ email, email_confirm: true, user_metadata: { display_name: email.split("@")[0] } }).catch(() => null);
