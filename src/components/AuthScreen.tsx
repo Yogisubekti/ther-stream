@@ -1,5 +1,7 @@
 import { Eye, EyeOff, Mail } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { lazy, Suspense, useState, type FormEvent } from "react";
+
+const PrivyLogin = lazy(() => import("@/components/PrivyLogin"));
 
 import { Button } from "@/components/ui/button";
 import { lovable } from "@/integrations/lovable";
@@ -39,6 +41,10 @@ export function AuthScreen() {
 
   return (
     <section className="glass-panel mt-7 w-full max-w-[400px] rounded-[28px] border border-surface/80 p-6 sm:p-8">
+      <Suspense fallback={<div className="h-11" />}><PrivyLogin /></Suspense>
+      <div className="my-5 flex items-center gap-3 text-[10px] font-medium uppercase text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />atau<span className="h-px flex-1 bg-border" />
+      </div>
       <div className="relative grid grid-cols-2 rounded-full bg-muted/70 p-1" role="tablist" aria-label="Authentication mode">
         <span aria-hidden="true" className={`absolute top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-full bg-surface shadow-tab transition-transform duration-300 ${mode === "signin" ? "translate-x-full" : "translate-x-0"}`} />
         <Button type="button" role="tab" aria-selected={mode === "signup"} variant="ghost" size="sm" className={`relative z-10 rounded-full ${mode === "signup" ? "text-foreground" : ""}`} onClick={() => setMode("signup")}>Sign Up</Button>
