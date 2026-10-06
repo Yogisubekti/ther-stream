@@ -17,3 +17,4 @@
 - Media uploads go browser→R2 via short-lived signed URLs from a server function; R2 keys never reach the browser.
 - FOMO API calls run server-side through one key pool that rotates keys and pauses ones that hit limits, with short in-memory caching.
 - Keep help, safety, community, and legal information on the dedicated `/support` route so it remains shareable and easy to find.
+- Privy login bridges to backend auth: server verifies Privy token, then issues a one-time magic-link token hash the browser exchanges for a session (keeps RLS working).
