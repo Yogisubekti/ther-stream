@@ -35,7 +35,7 @@ function Notifications() {
   const [items, setItems] = useState<Notif[] | null>(null);
   useEffect(() => {
     void supabase.from("notifications")
-      .select("id, type, detail, read, created_at, actor_id, actor:profiles!notifications_actor_id_fkey(id, display_name, username, avatar_url, wallet_address)")
+      .select("id, type, detail, read, created_at, actor_id, actor:profiles!notifications_actor_id_fkey(id, display_name, username, avatar_url)")
       .order("created_at", { ascending: false }).limit(60)
       .then(async ({ data }) => {
         setItems((data ?? []) as unknown as Notif[]);

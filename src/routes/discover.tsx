@@ -39,7 +39,7 @@ function Discover({ user }: { user: User }) {
 
   useEffect(() => {
     const t = setTimeout(async () => {
-      let query = supabase.from("profiles").select("id, display_name, username, bio, avatar_url, wallet_address, created_at").neq("id", user.id).limit(12);
+      let query = supabase.from("profiles").select("id, display_name, username, bio, avatar_url, created_at").neq("id", user.id).limit(12);
       const term = q.trim().replace(/[%,()]/g, "");
       if (term) query = query.or(`username.ilike.%${term}%,display_name.ilike.%${term}%`);
       else query = query.order("created_at", { ascending: false });

@@ -10,7 +10,7 @@ import { useFollows } from "@/lib/follows";
 import { displayName, handle, type Profile } from "@/lib/social";
 
 type Tab = "following" | "followers";
-const COLS = "id, display_name, username, bio, avatar_url, wallet_address, created_at";
+const COLS = "id, display_name, username, bio, avatar_url, created_at";
 
 export function FollowStats({ profileId, userId }: { profileId: string; userId: string }) {
   const { following: myFollowing } = useFollows();

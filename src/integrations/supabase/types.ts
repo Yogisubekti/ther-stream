@@ -624,7 +624,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_my_wallet: {
+        Args: never
+        Returns: {
+          wallet_address: string
+          wallet_verified_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
