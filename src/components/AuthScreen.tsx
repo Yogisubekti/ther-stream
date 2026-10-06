@@ -1,6 +1,8 @@
 import { lazy, Suspense } from "react";
 
-const PrivyLogin = lazy(() => import("@/components/PrivyLogin"));
+const PrivyLogin = lazy(() =>
+  import.meta.env.SSR ? Promise.resolve({ default: () => null }) : import("@/components/PrivyLogin"),
+);
 
 export function AuthScreen() {
   return (
