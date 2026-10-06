@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { CalendarDays, Camera, LogOut, Mail, Pencil, WalletCards } from "lucide-react";
+import { CalendarDays, Camera, Share2, LogOut, Mail, Pencil, WalletCards } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { User } from "@supabase/supabase-js";
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { uploadImage } from "@/lib/upload";
 import { supabase } from "@/integrations/supabase/client";
 import { linkWallet, walletMessage } from "@/lib/wallet.functions";
+import { profileLink, shareLink } from "@/lib/share";
 import { displayName, fetchPosts, handle, joined, resizeImage, short, type Post, type Profile } from "@/lib/social";
 
 export const Route = createFileRoute("/profile")({
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
       { title: "Profil — Mindcaster" },
-      { name: "description", content: "Profil Mindcaster: bio, username, foto, dompet Web3, postingan, dan repost." },
+      { name: "description", content: "Profil Mindcaster: bio, username, foto, dompet Web3, postingan, dan remind." },
       { property: "og:title", content: "Profil — Mindcaster" },
       { property: "og:description", content: "Lihat profil, postingan, dan repost di Mindcaster." },
       { property: "og:type", content: "profile" },
@@ -120,10 +121,10 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
 
       <div className="glass-panel grid grid-cols-2 rounded-full border border-surface/80 p-1">
         {(["posts", "reposts"] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={`rounded-full py-2 text-sm font-semibold transition ${tab === t ? "bg-surface shadow-tab" : "text-muted-foreground"}`}>{t === "posts" ? "Postingan" : "Repost"}</button>
+          <button key={t} onClick={() => setTab(t)} className={`rounded-full py-2 text-sm font-semibold transition ${tab === t ? "bg-surface shadow-tab" : "text-muted-foreground"}`}>{t === "posts" ? "Postingan" : "Remind"}</button>
         ))}
       </div>
-      {posts.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">Belum ada {tab === "posts" ? "postingan" : "repost"}.</p>}
+      {posts.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">Belum ada {tab === "posts" ? "postingan" : "remind"}.</p>}
       {posts.map((p) => <PostCard key={p.id} post={p} userId={user.id} onChange={loadPosts} onError={setError} />)}
     </>
   );

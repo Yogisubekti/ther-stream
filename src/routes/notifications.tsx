@@ -12,7 +12,7 @@ export const Route = createFileRoute("/notifications")({
   head: () => ({
     meta: [
       { title: "Notifikasi — Mindcaster" },
-      { name: "description", content: "Lihat siapa yang like, react, komentar, repost, dan mengirim pesan kepada Anda." },
+      { name: "description", content: "Lihat siapa yang like, react, komentar, remind, dan mengirim pesan kepada Anda." },
       { property: "og:title", content: "Notifikasi — Mindcaster" },
       { property: "og:description", content: "Aktivitas terbaru di akun Mindcaster Anda." },
       { property: "og:type", content: "website" },
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/notifications")({
 type Notif = { id: string; type: string; detail: string | null; read: boolean; created_at: string; actor_id: string; actor: Author };
 const META: Record<string, { icon: typeof Heart; text: string }> = {
   like: { icon: Heart, text: "menyukai postingan Anda" },
-  repost: { icon: Repeat2, text: "me-repost postingan Anda" },
+  repost: { icon: Repeat2, text: "me-remind postingan Anda" },
   reaction: { icon: SmilePlus, text: "memberi reaksi" },
   comment: { icon: MessageCircle, text: "mengomentari:" },
   message: { icon: Mail, text: "mengirim pesan:" },

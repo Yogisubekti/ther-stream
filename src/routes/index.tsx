@@ -18,9 +18,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Mindcaster — Where Ideas Become Onchain" },
-      { name: "description", content: "Mindcaster: social chain untuk posting, like, react, komentar, dan repost bersama komunitas Web3." },
+      { name: "description", content: "Mindcaster: social chain untuk posting, like, react, komentar, dan remind bersama komunitas Web3." },
       { property: "og:title", content: "Mindcaster — Where Ideas Become Onchain" },
-      { property: "og:description", content: "Social chain untuk posting, like, react, komentar, dan repost bersama komunitas Web3." },
+      { property: "og:description", content: "Social chain untuk posting, like, react, komentar, dan remind bersama komunitas Web3." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

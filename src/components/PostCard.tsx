@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent, type PointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bookmark, ChevronDown, Flag, Heart, MessageCircle, MoreHorizontal, Pencil, Repeat2, Trash2 } from "lucide-react";
+import { Bookmark, ChevronDown, Share2, Flag, Heart, MessageCircle, MoreHorizontal, Pencil, Repeat2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/Avatar";
@@ -12,6 +12,7 @@ import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
 import { supabase } from "@/integrations/supabase/client";
 import { useFollows } from "@/lib/follows";
 import { usePreferences } from "@/lib/preferences";
+import { postLink, shareLink } from "@/lib/share";
 import { REACTIONS, displayName, handle, short, timeAgo, type Post } from "@/lib/social";
 
 export function PostCard({ post: p, userId, onChange, onError }: { post: Post; userId: string; onChange: () => void; onError: (m: string) => void }) {
@@ -173,6 +174,7 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
             {REACTIONS.map((emoji) => <Button type="button" variant="ghost" size="icon" key={emoji} className={myReaction === emoji ? "size-9 bg-accent text-lg" : "size-9 text-lg"} aria-label={`Reaksi ${emoji}`} aria-pressed={myReaction === emoji} onClick={() => void chooseReaction(emoji)}>{emoji}</Button>)}
           </PopoverContent>
         </Popover>
+        <Button variant="ghost" size="icon" onClick={() => void shareLink(postLink(p.id))} aria-label="Share"><Share2 className="size-4" /></Button>
         <Button variant="ghost" size="icon" className={bookmarked ? "text-primary" : ""} onClick={toggleBookmark} aria-pressed={bookmarked} aria-label={bookmarked ? t("removeBookmark") : t("bookmark")}><Bookmark className={`size-4 ${bookmarked ? "fill-primary" : ""}`} /></Button>
       </div>
 
