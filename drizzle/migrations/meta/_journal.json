@@ -8,6 +8,13 @@
       "when": 1791308401553,
       "tag": "0000_story_views",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791309288654,
+      "tag": "0001_hide_wallet_address",
+      "breakpoints": true
     }
   ]
 }
