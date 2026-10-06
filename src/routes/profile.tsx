@@ -102,6 +102,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
                   <Button asChild variant="surface" size="sm"><Link to="/messages" search={{ with: profile.id }}><Mail className="size-4" />Pesan</Link></Button>
                 </>
               )}
+              <Button variant="ghost" size="icon" aria-label="Share profil" onClick={() => void shareLink(profileLink(profile.id), displayName(profile))}><Share2 className="size-4" /></Button>
             </div>
           </div>
           <h2 className="mt-3 flex items-center gap-1.5 font-display text-xl font-semibold">{displayName(profile)}<IdentityBadges username={profile.username} /></h2>

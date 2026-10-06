@@ -14,6 +14,7 @@ import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as FomoRouteImport } from './routes/fomo'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as PostRouteImport } from './routes/post'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as VerifyRouteImport } from './routes/verify'
@@ -43,6 +44,11 @@ const NotificationsRoute = NotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PostRoute = PostRouteImport.update({
+  id: '/post',
+  path: '/post',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/fomo': typeof FomoRoute
   '/messages': typeof MessagesRoute
   '/notifications': typeof NotificationsRoute
+  '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
   '/support': typeof SupportRoute
   '/verify': typeof VerifyRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/fomo': typeof FomoRoute
   '/messages': typeof MessagesRoute
   '/notifications': typeof NotificationsRoute
+  '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
   '/support': typeof SupportRoute
   '/verify': typeof VerifyRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/fomo': typeof FomoRoute
   '/messages': typeof MessagesRoute
   '/notifications': typeof NotificationsRoute
+  '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
   '/support': typeof SupportRoute
   '/verify': typeof VerifyRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/fomo'
     | '/messages'
     | '/notifications'
+    | '/post'
     | '/profile'
     | '/support'
     | '/verify'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/fomo'
     | '/messages'
     | '/notifications'
+    | '/post'
     | '/profile'
     | '/support'
     | '/verify'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/fomo'
     | '/messages'
     | '/notifications'
+    | '/post'
     | '/profile'
     | '/support'
     | '/verify'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   FomoRoute: typeof FomoRoute
   MessagesRoute: typeof MessagesRoute
   NotificationsRoute: typeof NotificationsRoute
+  PostRoute: typeof PostRoute
   ProfileRoute: typeof ProfileRoute
   SupportRoute: typeof SupportRoute
   VerifyRoute: typeof VerifyRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/post': {
+      id: '/post'
+      path: '/post'
+      fullPath: '/post'
+      preLoaderRoute: typeof PostRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   FomoRoute: FomoRoute,
   MessagesRoute: MessagesRoute,
   NotificationsRoute: NotificationsRoute,
+  PostRoute: PostRoute,
   ProfileRoute: ProfileRoute,
   SupportRoute: SupportRoute,
   VerifyRoute: VerifyRoute,
