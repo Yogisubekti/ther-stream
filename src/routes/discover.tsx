@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
+import { DiscoverBanners } from "@/components/DiscoverBanners";
 import { IdentityBadges } from "@/components/IdentityBadges";
 import { PostCard } from "@/components/PostCard";
 import { supabase } from "@/integrations/supabase/client";
