@@ -10,7 +10,7 @@ export const generatePostDraft = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ idea: z.string().trim().min(3).max(300) }).parse(d))
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("AI belum dikonfigurasi.");
     const { createOpenAI } = await import("@ai-sdk/openai");
     const { streamText } = await import("ai");
