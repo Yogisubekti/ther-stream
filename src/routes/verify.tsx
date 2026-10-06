@@ -51,7 +51,7 @@ function VerifyPage({ userId }: { userId: string }) {
       slotsFn().catch(() => null),
       supabase.from("verified_badges").select("verified_until, og, promo_used").eq("user_id", userId).maybeSingle(),
       supabase.rpc("get_my_wallet"),
-...
+]);
     setSlots(s); setBadge(b.data); setWallet(p.data?.[0]?.wallet_address ?? null);
   }
   useEffect(() => { void load(); }, [userId]);
