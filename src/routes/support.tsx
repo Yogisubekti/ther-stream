@@ -112,6 +112,17 @@ function SupportPage({ userId }: { userId: string }) {
 
   return (
     <>
+      <section aria-labelledby="about-mindcaster" className="rounded-2xl border border-border/70 bg-surface/80 p-5">
+        <p className="text-[11px] font-bold uppercase text-muted-foreground">Tentang Mindcaster</p>
+        <h2 id="about-mindcaster" className="mt-1 text-lg font-bold text-foreground">Where Ideas Become Onchain</h2>
+        <p className="mt-2 text-sm leading-relaxed text-foreground/80">Mindcaster adalah platform media sosial terdesentralisasi (Web3) yang menghubungkan diskusi komunitas kripto dengan data onchain secara langsung. Menggabungkan pengalaman microblogging modern dengan kekuatan ekosistem Web3, Mindcaster memungkinkan pengguna untuk:</p>
+        <ul className="mt-3 space-y-2.5 text-sm leading-relaxed text-foreground/80">
+          <li className="flex gap-3"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" /><span><b className="text-foreground">Berbagi Ide & Cerita:</b> mengunggah pemikiran, diskusi feed, serta foto/video melalui Story 24 jam.</span></li>
+          <li className="flex gap-3"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" /><span><b className="text-foreground">Sinyal Pasar & Alpha (FOMO Hub):</b> memantau sinyal beli/jual real-time, tesis trader terkurasi, dan leaderboard PnL mingguan.</span></li>
+          <li className="flex gap-3"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" /><span><b className="text-foreground">Identitas & Verifikasi Onchain:</b> menautkan dompet kripto serta memperoleh centang biru dan Badge OG melalui pembayaran di Base, Polygon, dan BNB Chain.</span></li>
+        </ul>
+      </section>
+
       <section aria-labelledby="support-heading">
         <p id="support-heading" className="mb-2 px-2 text-[11px] font-bold uppercase text-muted-foreground">Dukungan</p>
         <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface/80">
