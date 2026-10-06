@@ -100,6 +100,12 @@ function Inner() {
       <Button type="submit" size="lg" className="mt-5 w-full" disabled={loading}>
         {loading ? "Mohon tunggu..." : step === "email" ? "Lanjutkan dengan Email" : "Masuk"}
       </Button>
+      <div className="my-5 flex items-center gap-3 text-[10px] font-medium uppercase text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />atau<span className="h-px flex-1 bg-border" />
+      </div>
+      <Button type="button" variant="surface" size="lg" className="w-full" disabled={loading} onClick={onGoogle}>
+        <span className="font-display text-base font-semibold leading-none">G</span>Lanjutkan dengan Google
+      </Button>
       <p className="mt-2 text-center text-xs text-muted-foreground">Wallet otomatis dibuat untuk akun baru.</p>
     </form>
   );
