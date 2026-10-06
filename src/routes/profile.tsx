@@ -32,9 +32,6 @@ export const Route = createFileRoute("/profile")({
   component: ProfileRoute,
 });
 
-declare global {
-  interface Window { ethereum?: { request: (args: { method: string; params?: unknown[] }) => Promise<unknown> } }
-}
 
 function ProfileRoute() {
   const { id } = Route.useSearch();
