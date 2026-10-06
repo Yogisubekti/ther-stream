@@ -37,7 +37,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   useEffect(() => {
     if (!user) return;
     void supabase.from("notifications").select("id", { count: "exact", head: true }).eq("read", false).then(({ count }) => setUnread(count ?? 0));
-    const cols = "id, display_name, username, bio, avatar_url, wallet_address, created_at";
+    const cols = "id, display_name, username, bio, avatar_url, created_at";
     void (async () => {
       let { data } = await supabase.from("profiles").select(cols).eq("id", user.id).maybeSingle();
       if (!data) {

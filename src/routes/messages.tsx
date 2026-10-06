@@ -27,7 +27,7 @@ export const Route = createFileRoute("/messages")({
 });
 
 type Msg = { id: string; sender_id: string; recipient_id: string; content: string; created_at: string };
-const PROFILE_COLS = "id, display_name, username, bio, avatar_url, wallet_address, created_at";
+const PROFILE_COLS = "id, display_name, username, bio, avatar_url, created_at";
 
 function MessagesPage() {
   const { with: other } = Route.useSearch();

@@ -48,7 +48,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
   const link = useServerFn(linkWallet);
 
   const loadProfile = useCallback(async () => {
-    const { data } = await supabase.from("profiles").select("id, display_name, username, bio, avatar_url, wallet_address, created_at").eq("id", profileId).maybeSingle();
+    const { data } = await supabase.from("profiles").select("id, display_name, username, bio, avatar_url, created_at").eq("id", profileId).maybeSingle();
     setProfile(data as Profile | null);
   }, [profileId]);
 

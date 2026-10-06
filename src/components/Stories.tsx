@@ -16,7 +16,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.from("stories" as never)
-      .select("id, author_id, media_url, media_type, created_at, author:profiles!stories_author_id_fkey(id, display_name, username, avatar_url, wallet_address)")
+      .select("id, author_id, media_url, media_type, created_at, author:profiles!stories_author_id_fkey(id, display_name, username, avatar_url)")
       .gt("expires_at", new Date().toISOString()).order("created_at", { ascending: true });
     if (error) return onError(error.message);
     const map = new Map<string, Group>();
@@ -62,7 +62,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
   async function loadViewers() {
     if (!cur) return;
     const { data, error } = await supabase.from("story_views" as never)
-      .select("viewer_id, reaction, viewer:profiles!story_views_viewer_id_fkey(id, display_name, username, avatar_url, wallet_address)")
+      .select("viewer_id, reaction, viewer:profiles!story_views_viewer_id_fkey(id, display_name, username, avatar_url)")
       .eq("story_id", cur.id).order("created_at", { ascending: false });
     if (error) return onError(error.message);
     setViewers((data ?? []) as never);

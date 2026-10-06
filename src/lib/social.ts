@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type Author = { id: string; display_name: string | null; username: string | null; avatar_url: string | null; wallet_address: string | null } | null;
+export type Author = { id: string; display_name: string | null; username: string | null; avatar_url: string | null; wallet_address?: string | null } | null;
 export type Comment = { id: string; content: string; created_at: string; author_id: string; author: Author };
 export type Post = {
   id: string; content: string; image_url?: string | null; created_at: string; author_id: string; author: Author;
@@ -12,10 +12,10 @@ export type Post = {
 };
 export type Profile = {
   id: string; display_name: string | null; username: string | null; bio: string | null;
-  avatar_url: string | null; wallet_address: string | null; created_at: string;
+  avatar_url: string | null; wallet_address?: string | null; created_at: string;
 };
 
-const AUTHOR = "id, display_name, username, avatar_url, wallet_address";
+const AUTHOR = "id, display_name, username, avatar_url";
 export const POST_SELECT = `id, content, image_url, created_at, author_id, author:profiles!posts_author_id_fkey(${AUTHOR}), post_likes(user_id), post_reposts(user_id), post_reactions(user_id, emoji), post_bookmarks(user_id), post_comments(id, content, created_at, author_id, author:profiles!post_comments_author_id_fkey(${AUTHOR}))`;
 
 export const REACTIONS = ["🔥", "😂", "😮", "🚀", "👏"] as const;
