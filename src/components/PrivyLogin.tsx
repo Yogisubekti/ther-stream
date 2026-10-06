@@ -72,12 +72,6 @@ function Inner() {
 
   return (
     <form onSubmit={onSubmit}>
-      <Button type="button" variant="surface" size="lg" className="w-full" disabled={loading} onClick={onGoogle}>
-        <span className="font-display text-base font-semibold leading-none">G</span>Lanjutkan dengan Google
-      </Button>
-      <div className="my-5 flex items-center gap-3 text-[10px] font-medium uppercase text-muted-foreground">
-        <span className="h-px flex-1 bg-border" />atau dengan email<span className="h-px flex-1 bg-border" />
-      </div>
       <div className="space-y-3.5">
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold text-foreground/70">Email</span>
@@ -105,6 +99,12 @@ function Inner() {
       {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
       <Button type="submit" size="lg" className="mt-5 w-full" disabled={loading}>
         {loading ? "Mohon tunggu..." : step === "email" ? "Lanjutkan dengan Email" : "Masuk"}
+      </Button>
+      <div className="my-5 flex items-center gap-3 text-[10px] font-medium uppercase text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />atau<span className="h-px flex-1 bg-border" />
+      </div>
+      <Button type="button" variant="surface" size="lg" className="w-full" disabled={loading} onClick={onGoogle}>
+        <span className="font-display text-base font-semibold leading-none">G</span>Lanjutkan dengan Google
       </Button>
       <p className="mt-2 text-center text-xs text-muted-foreground">Wallet otomatis dibuat untuk akun baru.</p>
     </form>
