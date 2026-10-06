@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { BadgeCheck, Bookmark, Check, CircleHelp, Languages, Menu, ImagePlus, Send, Users, UserRoundPlus } from "lucide-react";
+import { BadgeCheck, Bookmark, Check, CircleHelp, Languages, Loader2, Menu, ImagePlus, Send, Users, UserRoundPlus, Wand2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { generatePostDraft } from "@/lib/ai-draft.functions";
 import type { User } from "@supabase/supabase-js";
 
 import { AppShell } from "@/components/AppShell";
@@ -66,6 +68,14 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
   const [image, setImage] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [idea, setIdea] = useState("");
+  const [drafting, setDrafting] = useState(false);
+  const runDraft = useServerFn(generatePostDraft);
+  async function draftWithAi() {
+    setDrafting(true); setError(null);
+    try { const r = await runDraft({ data: { idea } }); setDraft(r.draft); setIdea(""); }
+    catch (e) { setError((e as Error).message); } finally { setDrafting(false); }
+  }
   const load = useCallback(async () => {
     try {
       if (view === "bookmarks") {
@@ -108,6 +118,10 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
       <Stories userId={user.id} onError={setError} />
       <form onSubmit={createPost} className="glass-panel rounded-[24px] border border-surface/80 p-4">
         <textarea value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={500} rows={3} placeholder={t("whatsHappening")} className="w-full resize-none rounded-xl border border-border/60 bg-surface/75 p-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/25" />
+        <div className="mt-2 flex gap-2">
+          <input value={idea} onChange={(e) => setIdea(e.target.value)} maxLength={300} placeholder="Ide singkat → draf AI" className="h-9 min-w-0 flex-1 rounded-xl border border-border/60 bg-surface/75 px-3 text-sm outline-none focus:border-primary" />
+          <Button type="button" size="sm" variant="surface" disabled={drafting || idea.trim().length < 3} onClick={draftWithAi}>{drafting ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}Draf AI</Button>
+        </div>
         {image && <div className="relative mt-2"><img src={URL.createObjectURL(image)} alt="Pratinjau" className="max-h-60 w-full rounded-xl object-cover" /><button type="button" onClick={() => setImage(null)} aria-label="Hapus gambar" className="absolute right-2 top-2 rounded-full bg-background/80 px-2 text-sm">✕</button></div>}
         <div className="mt-3 flex items-center justify-between">
           <span className="flex items-center gap-3 text-xs text-muted-foreground">
