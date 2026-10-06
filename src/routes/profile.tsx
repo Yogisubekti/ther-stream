@@ -52,7 +52,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
     let wallet_address: string | null = null;
     if (data && isMe) { const { data: w } = await supabase.rpc("get_my_wallet"); wallet_address = w?.[0]?.wallet_address ?? null; }
     setProfile(data ? ({ ...data, wallet_address } as Profile) : null);
-  }, [profileId]);
+  }, [profileId, isMe]);
 
   const loadPosts = useCallback(async () => {
     try {
