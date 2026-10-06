@@ -15,14 +15,9 @@ export function DiscoverBanners() {
   const [index, setIndex] = useState(0);
   const [showSoon, setShowSoon] = useState(false);
 
-  useEffect(() => {
-    const t = setInterval(() => setIndex((i) => (i + 1) % BANNERS.length), ROTATE_MS);
-    return () => clearInterval(t);
-  }, []);
-
   // Pause auto-rotation while the "soon" popup is open.
   useEffect(() => {
-    if (!showSoon) return;
+    if (showSoon) return;
     const t = setInterval(() => setIndex((i) => (i + 1) % BANNERS.length), ROTATE_MS);
     return () => clearInterval(t);
   }, [showSoon]);
