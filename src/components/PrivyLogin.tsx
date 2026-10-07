@@ -34,7 +34,7 @@ function Inner() {
         const { error: e } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "magiclink" });
         if (e) throw e;
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Gagal masuk.");
+        setError(e instanceof Error ? e.message : "Sign-in failed.");
         done.current = false;
         await logout();
         setStep("email");
@@ -65,7 +65,7 @@ function Inner() {
   async function onGoogle() {
     setError(null);
     try { await initOAuth({ provider: "google" }); }
-    catch (err) { setError(err instanceof Error ? err.message : "Gagal masuk dengan Google."); }
+    catch (err) { setError(err instanceof Error ? err.message : "Google sign-in failed."); }
   }
 
   const loading = oauthLoading || busy || !ready || state.status === "sending-code" || state.status === "submitting-code";
@@ -85,28 +85,28 @@ function Inner() {
             <span className="mb-1.5 block text-xs font-semibold text-foreground/70">Kode verifikasi</span>
             <span className="relative block">
               <KeyRound className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <input required inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Kode 6 digit dari email" className={inputClass} />
+              <input required inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="6-digit code from your email" className={inputClass} />
             </span>
           </label>
         )}
       </div>
       {step === "code" && (
         <p className="mt-3 text-xs text-muted-foreground">
-          Kode dikirim ke {email}.{" "}
+          Code sent to {email}.{" "}
           <button type="button" className="font-semibold text-link underline underline-offset-2" onClick={() => { setStep("email"); setCode(""); }}>Ganti email</button>
         </p>
       )}
       {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
       <Button type="submit" size="lg" className="mt-5 w-full" disabled={loading}>
-        {loading ? "Mohon tunggu..." : step === "email" ? "Lanjutkan dengan Email" : "Masuk"}
+        {loading ? "Please wait..." : step === "email" ? "Continue with Email" : "Sign in"}
       </Button>
       <div className="my-5 flex items-center gap-3 text-[10px] font-medium uppercase text-muted-foreground">
         <span className="h-px flex-1 bg-border" />atau<span className="h-px flex-1 bg-border" />
       </div>
       <Button type="button" variant="surface" size="lg" className="w-full" disabled={loading} onClick={onGoogle}>
-        <span className="font-display text-base font-semibold leading-none">G</span>Lanjutkan dengan Google
+        <span className="font-display text-base font-semibold leading-none">G</span>Continue with Google
       </Button>
-      <p className="mt-2 text-center text-xs text-muted-foreground">Wallet otomatis dibuat untuk akun baru.</p>
+      <p className="mt-2 text-center text-xs text-muted-foreground">A wallet is created automatically for new accounts.</p>
     </form>
   );
 }

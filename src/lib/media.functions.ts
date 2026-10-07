@@ -15,7 +15,7 @@ export const createUploadUrl = createServerFn({ method: "POST" })
       kind: z.enum(["avatar", "post", "story"]),
       contentType: z.enum(["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/webm", "video/quicktime"]),
       size: z.number().int().positive().max(MAX_UPLOAD),
-    }).refine((v) => v.kind === "story" || v.contentType.startsWith("image/"), "Video hanya untuk story").parse(d),
+    }).refine((v) => v.kind === "story" || v.contentType.startsWith("image/"), "Video is only allowed for stories").parse(d),
   )
   .handler(async ({ data, context }) => {
     const accountId = process.env["CLOUDFLARE_R2_ACCOUNT_ID"];
@@ -23,7 +23,7 @@ export const createUploadUrl = createServerFn({ method: "POST" })
     const secretAccessKey = process.env["CLOUDFLARE_R2_SECRET_ACCESS_KEY"];
     const bucket = process.env["CLOUDFLARE_R2_BUCKET_NAME"]?.trim().toLowerCase();
     const publicUrl = process.env["CLOUDFLARE_R2_PUBLIC_URL"]?.trim();
-    if (!accountId || !accessKeyId || !secretAccessKey || !bucket || !publicUrl) throw new Error("Penyimpanan belum dikonfigurasi.");
+    if (!accountId || !accessKeyId || !secretAccessKey || !bucket || !publicUrl) throw new Error("Storage is not configured.");
     const { AwsClient } = await import("aws4fetch");
     const client = new AwsClient({ accessKeyId, secretAccessKey, service: "s3", region: "auto" });
     const key = `${data.kind === "story" ? "stories" : `${data.kind}s`}/${context.userId}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${TYPES[data.contentType]}`;

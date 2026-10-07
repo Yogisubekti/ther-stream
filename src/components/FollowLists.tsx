@@ -31,12 +31,12 @@ export function FollowStats({ profileId, userId }: { profileId: string; userId: 
   return (
     <>
       <div className="mt-3 flex gap-4 text-sm">
-        <button onClick={() => setOpen("following")} className="hover:underline"><span className="font-semibold">{counts.following}</span> <span className="text-muted-foreground">Mengikuti</span></button>
-        <button onClick={() => setOpen("followers")} className="hover:underline"><span className="font-semibold">{counts.followers}</span> <span className="text-muted-foreground">Pengikut</span></button>
+        <button onClick={() => setOpen("following")} className="hover:underline"><span className="font-semibold">{counts.following}</span> <span className="text-muted-foreground">Following</span></button>
+        <button onClick={() => setOpen("followers")} className="hover:underline"><span className="font-semibold">{counts.followers}</span> <span className="text-muted-foreground">Followers</span></button>
       </div>
       <Dialog open={open !== null} onOpenChange={(v) => !v && setOpen(null)}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Koneksi</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Connections</DialogTitle></DialogHeader>
           {open && <FollowList profileId={profileId} userId={userId} tab={open} setTab={setOpen} onNavigate={() => setOpen(null)} />}
         </DialogContent>
       </Dialog>
@@ -65,12 +65,12 @@ function FollowList({ profileId, userId, tab, setTab, onNavigate }: { profileId:
     <div>
       <div className="mb-3 grid grid-cols-2 rounded-full bg-muted p-1">
         {(["following", "followers"] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={`rounded-full py-1.5 text-sm font-semibold transition ${tab === t ? "bg-background shadow-sm" : "text-muted-foreground"}`}>{t === "following" ? "Mengikuti" : "Pengikut"}</button>
+          <button key={t} onClick={() => setTab(t)} className={`rounded-full py-1.5 text-sm font-semibold transition ${tab === t ? "bg-background shadow-sm" : "text-muted-foreground"}`}>{t === "following" ? "Following" : "Followers"}</button>
         ))}
       </div>
       <div className="max-h-[60vh] space-y-2 overflow-y-auto">
-        {people === null && <p className="py-6 text-center text-sm text-muted-foreground">Memuat…</p>}
-        {people?.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">{tab === "following" ? "Belum mengikuti siapa pun." : "Belum ada pengikut."}</p>}
+        {people === null && <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>}
+        {people?.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">{tab === "following" ? "Not following anyone yet." : "No followers yet."}</p>}
         {people?.map((p) => (
           <div key={p.id} className="flex items-center gap-3 rounded-xl p-2 hover:bg-muted/60">
             <Link to="/profile" search={{ id: p.id }} onClick={onNavigate} className="flex min-w-0 flex-1 items-center gap-3">
@@ -82,7 +82,7 @@ function FollowList({ profileId, userId, tab, setTab, onNavigate }: { profileId:
             </Link>
             {p.id !== userId && (
               <Button size="sm" variant={following.has(p.id) ? "surface" : "default"} disabled={pending.has(p.id)} onClick={() => toggleFollow(p.id)}>
-                {following.has(p.id) ? "Mengikuti" : "Ikuti"}
+                {following.has(p.id) ? "Following" : "Follow"}
               </Button>
             )}
           </div>
@@ -95,5 +95,5 @@ function FollowList({ profileId, userId, tab, setTab, onNavigate }: { profileId:
 export function ProfileFollowButton({ profileId }: { profileId: string }) {
   const { following, pending, toggleFollow } = useFollows();
   const on = following.has(profileId);
-  return <Button size="sm" variant={on ? "surface" : "default"} disabled={pending.has(profileId)} onClick={() => toggleFollow(profileId)}>{on ? "Mengikuti" : "Ikuti"}</Button>;
+  return <Button size="sm" variant={on ? "surface" : "default"} disabled={pending.has(profileId)} onClick={() => toggleFollow(profileId)}>{on ? "Following" : "Follow"}</Button>;
 }

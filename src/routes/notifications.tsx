@@ -12,9 +12,9 @@ export const Route = createFileRoute("/notifications")({
   head: () => ({
     meta: [
       { title: "Notifikasi — Mindcaster" },
-      { name: "description", content: "Lihat siapa yang like, react, komentar, remind, dan mengirim pesan kepada Anda." },
+      { name: "description", content: "See who liked, reacted, commented, reminded, and messaged you." },
       { property: "og:title", content: "Notifikasi — Mindcaster" },
-      { property: "og:description", content: "Aktivitas terbaru di akun Mindcaster Anda." },
+      { property: "og:description", content: "Latest activity on your Mindcaster account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -24,11 +24,11 @@ export const Route = createFileRoute("/notifications")({
 
 type Notif = { id: string; type: string; detail: string | null; read: boolean; created_at: string; actor_id: string; actor: Author };
 const META: Record<string, { icon: typeof Heart; text: string }> = {
-  like: { icon: Heart, text: "menyukai postingan Anda" },
-  repost: { icon: Repeat2, text: "me-remind postingan Anda" },
+  like: { icon: Heart, text: "liked your post" },
+  repost: { icon: Repeat2, text: "reminded your post" },
   reaction: { icon: SmilePlus, text: "memberi reaksi" },
   comment: { icon: MessageCircle, text: "mengomentari:" },
-  message: { icon: Mail, text: "mengirim pesan:" },
+  message: { icon: Mail, text: "sent a message:" },
 };
 
 function Notifications() {
@@ -44,7 +44,7 @@ function Notifications() {
   }, []);
 
   if (!items) return null;
-  if (items.length === 0) return <p className="py-10 text-center text-sm text-muted-foreground">Belum ada notifikasi.</p>;
+  if (items.length === 0) return <p className="py-10 text-center text-sm text-muted-foreground">No notifications yet.</p>;
   return (
     <ul className="glass-panel divide-y divide-border/50 overflow-hidden rounded-[24px] border border-surface/80">
       {items.map((n) => {

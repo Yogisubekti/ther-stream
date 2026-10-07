@@ -120,7 +120,7 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
   async function submitReport(e: FormEvent) {
     e.preventDefault();
     const { error } = await supabase.from("post_reports").insert({ post_id: p.id, reporter_id: userId, reason });
-    if (error) return onError(error.code === "23505" ? "Postingan ini sudah pernah Anda laporkan." : error.message);
+    if (error) return onError(error.code === "23505" ? "You've already reported this post." : error.message);
     setReporting(false);
     toast.success(t("reportSent"), { description: t("reportThanks") });
   }

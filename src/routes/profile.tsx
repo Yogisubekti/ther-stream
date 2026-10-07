@@ -20,9 +20,9 @@ export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
       { title: "Profil — Mindcaster" },
-      { name: "description", content: "Profil Mindcaster: bio, username, foto, dompet Web3, postingan, dan remind." },
+      { name: "description", content: "Mindcaster profile: bio, username, photo, posts, and reminds." },
       { property: "og:title", content: "Profil — Mindcaster" },
-      { property: "og:description", content: "Lihat profil, postingan, dan repost di Mindcaster." },
+      { property: "og:description", content: "View profiles, posts, and reposts on Mindcaster." },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -65,7 +65,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
   useEffect(() => { void loadPosts(); }, [loadPosts]);
 
 
-  if (!profile) return <p className="py-10 text-center text-sm text-muted-foreground">Memuat profil…</p>;
+  if (!profile) return <p className="py-10 text-center text-sm text-muted-foreground">Loading profile…</p>;
 
   return (
     <>
@@ -78,22 +78,22 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
               {isMe ? (
                 <>
                   <Button variant="surface" size="sm" onClick={() => setEditing((v) => !v)}><Pencil className="size-4" />Edit profil</Button>
-                  <Button variant="ghost" size="icon" aria-label="Keluar" onClick={() => supabase.auth.signOut()}><LogOut className="size-4" /></Button>
+                  <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => supabase.auth.signOut()}><LogOut className="size-4" /></Button>
                 </>
               ) : (
                 <>
                   <ProfileFollowButton profileId={profile.id} />
-                  <Button asChild variant="surface" size="sm"><Link to="/messages" search={{ with: profile.id }}><Mail className="size-4" />Pesan</Link></Button>
+                  <Button asChild variant="surface" size="sm"><Link to="/messages" search={{ with: profile.id }}><Mail className="size-4" />Message</Link></Button>
                 </>
               )}
               <Button variant="ghost" size="icon" aria-label="Share profil" onClick={() => void shareLink(profileLink(profile.id), displayName(profile))}><Share2 className="size-4" /></Button>
             </div>
           </div>
           <h2 className="mt-3 flex items-center gap-1.5 font-display text-xl font-semibold">{displayName(profile)}<IdentityBadges username={profile.username} /></h2>
-          {handle(profile) ? <p className="text-sm text-muted-foreground">{handle(profile)}</p> : isMe && <p className="text-sm text-muted-foreground">Belum ada username</p>}
+          {handle(profile) ? <p className="text-sm text-muted-foreground">{handle(profile)}</p> : isMe && <p className="text-sm text-muted-foreground">No username yet</p>}
           {profile.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1"><CalendarDays className="size-3.5" />Bergabung {joined(profile.created_at)}</span>
+            <span className="flex items-center gap-1"><CalendarDays className="size-3.5" />Joined {joined(profile.created_at)}</span>
             {profile.wallet_address && <span className="flex items-center gap-1 text-primary"><WalletCards className="size-3.5" />{short(profile.wallet_address)}</span>}
           </div>
           <FollowStats profileId={profile.id} userId={user.id} />
@@ -108,7 +108,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
           <button key={t} onClick={() => setTab(t)} className={`rounded-full py-2 text-sm font-semibold transition ${tab === t ? "bg-surface shadow-tab" : "text-muted-foreground"}`}>{t === "posts" ? "Postingan" : "Remind"}</button>
         ))}
       </div>
-      {posts.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">Belum ada {tab === "posts" ? "postingan" : "remind"}.</p>}
+      {posts.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No {tab === "posts" ? "posts" : "reminds"} yet.</p>}
       {posts.map((p) => <PostCard key={p.id} post={p} userId={user.id} onChange={loadPosts} onError={setError} />)}
     </>
   );
@@ -130,7 +130,7 @@ function EditProfile({ profile, onDone }: { profile: Profile; onDone: () => void
     setSaving(true);
     const { error } = await supabase.from("profiles").update({ display_name: name.trim() || null, username: u || null, bio: bio.trim() || null, avatar_url: avatar }).eq("id", profile.id);
     setSaving(false);
-    if (error) return setError(error.code === "23505" ? "Username sudah dipakai." : error.message);
+    if (error) return setError(error.code === "23505" ? "Username is already taken." : error.message);
     onDone();
   }
 
@@ -149,7 +149,7 @@ function EditProfile({ profile, onDone }: { profile: Profile; onDone: () => void
           <Camera className="size-4" />Ganti foto
           <input type="file" accept="image/*" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
         </label>
-        {avatar && <button type="button" onClick={() => setAvatar(null)} className="text-xs text-muted-foreground underline">Hapus</button>}
+        {avatar && <button type="button" onClick={() => setAvatar(null)} className="text-xs text-muted-foreground underline">Remove</button>}
       </div>
       <label className="block"><span className="mb-1 block text-xs font-semibold text-foreground/70">Nama</span><input value={name} onChange={(e) => setName(e.target.value)} maxLength={50} className={field} /></label>
       <label className="block"><span className="mb-1 block text-xs font-semibold text-foreground/70">Username</span>
@@ -158,8 +158,8 @@ function EditProfile({ profile, onDone }: { profile: Profile; onDone: () => void
       <label className="block"><span className="mb-1 block text-xs font-semibold text-foreground/70">Bio</span><textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={160} rows={3} className={`${field} h-auto resize-none py-2`} /><span className="text-xs text-muted-foreground">{bio.length}/160</span></label>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="ghost" size="sm" onClick={onDone}>Batal</Button>
-        <Button type="submit" size="sm" disabled={saving}>{saving ? "Menyimpan…" : "Simpan"}</Button>
+        <Button type="button" variant="ghost" size="sm" onClick={onDone}>Cancel</Button>
+        <Button type="submit" size="sm" disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
       </div>
     </form>
   );

@@ -11,9 +11,9 @@ export const Route = createFileRoute("/fomo")({
   head: () => ({
     meta: [
       { title: "Fomo — Mindcaster" },
-      { name: "description", content: "Live feed trader FOMO, thesis, dan leaderboard PnL mingguan di Mindcaster." },
+      { name: "description", content: "FOMO trader live feed, theses, and weekly PnL leaderboard on Mindcaster." },
       { property: "og:title", content: "Fomo — Mindcaster" },
-      { property: "og:description", content: "Live feed trader FOMO, thesis, dan leaderboard PnL mingguan di Mindcaster." },
+      { property: "og:description", content: "FOMO trader live feed, theses, and weekly PnL leaderboard on Mindcaster." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -77,7 +77,7 @@ function Fomo() {
     <>
       <section className="glass-panel flex items-center gap-3 rounded-[24px] border border-surface/80 p-4">
         <img src={fomoLogo.url} alt="Logo Fomo" width={816} height={816} className="size-11 rounded-xl object-contain" />
-        <div className="flex-1"><h2 className="font-display font-semibold">Fomo Family</h2><p className="text-xs text-muted-foreground">Data trader langsung dari FOMO</p></div>
+        <div className="flex-1"><h2 className="font-display font-semibold">Fomo Family</h2><p className="text-xs text-muted-foreground">Live trader data from FOMO</p></div>
         <button type="button" onClick={() => setNonce((n) => n + 1)} aria-label="Muat ulang" className="grid size-9 place-items-center rounded-full bg-surface/70"><RefreshCw className={`size-4 ${loading ? "animate-spin" : ""}`} /></button>
       </section>
       <div className="glass-panel grid grid-cols-3 gap-1 rounded-full border border-surface/80 p-1">
@@ -86,7 +86,7 @@ function Fomo() {
         ))}
       </div>
       {error && <p role="alert" className="glass-panel rounded-2xl p-4 text-sm text-destructive">{error}</p>}
-      {!loading && !error && rows.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">Belum ada data.</p>}
+      {!loading && !error && rows.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No data yet.</p>}
       {tab === "leaderboard"
         ? rows.map((r, i) => {
             const pnl = Number(pick(r, "pnl", "pnl_usd", "realized_pnl", "total_pnl", "stats.pnl"));

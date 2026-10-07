@@ -67,7 +67,7 @@ export function DiscoverBanners() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Segera hadir"
+          aria-label="Coming soon"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6"
           onClick={() => setShowSoon(false)}
         >
@@ -84,9 +84,9 @@ export function DiscoverBanners() {
               <X className="size-4" />
             </button>
             <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-primary/15 text-2xl">👑</div>
-            <h3 className="font-display text-lg font-bold">Segera Hadir</h3>
+            <h3 className="font-display text-lg font-bold">Coming Soon</h3>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              OG NFT Mindcaster belum dibuka. Nantikan peluncurannya, OG pertama akan mendapat keistimewaan spesial.
+              Mindcaster OG NFT isn't open yet. Stay tuned — the first OGs will get special perks.
             </p>
             <button
               type="button"

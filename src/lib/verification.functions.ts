@@ -30,16 +30,16 @@ export const confirmVerificationPayment = createServerFn({ method: "POST" })
 
     const { data: profile } = await supabaseAdmin.from("profiles").select("wallet_address").eq("id", context.userId).maybeSingle();
     const wallet = profile?.wallet_address?.toLowerCase();
-    if (!wallet) throw new Error("Hubungkan dompet di profil terlebih dahulu.");
+    if (!wallet) throw new Error("Set up your wallet first.");
 
     const { data: dup } = await supabaseAdmin.from("verification_payments").select("id").eq("tx_hash", txHash).maybeSingle();
-    if (dup) throw new Error("Transaksi ini sudah dipakai.");
+    if (dup) throw new Error("This transaction has already been used.");
 
     const { data: badge } = await supabaseAdmin.from("verified_badges").select("*").eq("user_id", context.userId).maybeSingle();
     if (data.plan === "promo") {
       if (badge?.promo_used) throw new Error("Promo hanya bisa dipakai sekali.");
       const { count } = await supabaseAdmin.from("verified_badges").select("user_id", { count: "exact", head: true }).eq("promo_used", true);
-      if ((count ?? 0) >= PROMO_LIMIT) throw new Error("Kuota promo sudah habis.");
+      if ((count ?? 0) >= PROMO_LIMIT) throw new Error("The promo quota is sold out.");
     }
 
     const { createPublicClient, http, parseEventLogs, erc20Abi } = await import("viem");
@@ -48,9 +48,9 @@ export const confirmVerificationPayment = createServerFn({ method: "POST" })
     try {
       receipt = await client.waitForTransactionReceipt({ hash: txHash as `0x${string}`, timeout: 45_000 });
     } catch {
-      throw new Error("Transaksi belum terkonfirmasi. Coba lagi sebentar.");
+      throw new Error("Transaction not confirmed yet. Try again shortly.");
     }
-    if (receipt.status !== "success") throw new Error("Transaksi gagal di blockchain.");
+    if (receipt.status !== "success") throw new Error("Transaction failed on-chain.");
     const need = BigInt(plan.usd) * 10n ** BigInt(token.decimals);
     const logs = parseEventLogs({ abi: erc20Abi, eventName: "Transfer", logs: receipt.logs });
     const paid = logs.some((l) =>
@@ -59,7 +59,7 @@ export const confirmVerificationPayment = createServerFn({ method: "POST" })
       l.args.to.toLowerCase() === PAY_TO.toLowerCase() &&
       l.args.value >= need,
     );
-    if (!paid) throw new Error("Pembayaran tidak cocok (jumlah, koin, atau dompet pengirim).");
+    if (!paid) throw new Error("Payment doesn't match (amount, token, or sender wallet).");
 
     const now = Date.now();
     const base = badge && Date.parse(badge.verified_until) > now ? Date.parse(badge.verified_until) : now;
@@ -69,11 +69,11 @@ export const confirmVerificationPayment = createServerFn({ method: "POST" })
       user_id: context.userId, plan: data.plan, chain: data.chain, token: data.token, tx_hash: txHash,
       amount_usd: plan.usd, starts_at: new Date(base).toISOString(), expires_at: expires,
     });
-    if (payErr) throw new Error(payErr.code === "23505" ? "Transaksi ini sudah dipakai." : "Gagal menyimpan pembayaran.");
+    if (payErr) throw new Error(payErr.code === "23505" ? "This transaction has already been used." : "Could not save payment.");
     const { error } = await supabaseAdmin.from("verified_badges").upsert({
       user_id: context.userId, verified_until: expires, og: (badge?.og ?? false) || plan.og,
       promo_used: (badge?.promo_used ?? false) || data.plan === "promo", updated_at: new Date().toISOString(),
     });
-    if (error) throw new Error("Gagal mengaktifkan verifikasi.");
+    if (error) throw new Error("Could not activate verification.");
     return { verifiedUntil: expires, og: (badge?.og ?? false) || plan.og };
   });

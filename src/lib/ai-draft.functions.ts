@@ -11,7 +11,7 @@ export const generatePostDraft = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ idea: z.string().trim().min(3).max(300) }).parse(d))
   .handler(async ({ data }) => {
     const apiKey = process.env["LOVABLE_API_KEY"];
-    if (!apiKey) throw new Error("AI belum dikonfigurasi.");
+    if (!apiKey) throw new Error("AI is not configured.");
     const { createOpenAI } = await import("@ai-sdk/openai");
     const { streamText } = await import("ai");
     const provider = createOpenAI({
@@ -34,7 +34,7 @@ export const generatePostDraft = createServerFn({ method: "POST" })
       const status = (failure as { statusCode?: number } | undefined)?.statusCode;
       if (status === 429) throw new Error("Terlalu banyak permintaan, coba lagi sebentar.");
       if (status === 402) throw new Error("Kredit AI habis.");
-      throw new Error("AI tidak dapat membuat draf saat ini.");
+      throw new Error("AI couldn't create a draft right now.");
     }
     return { draft: text.slice(0, 500) };
   });

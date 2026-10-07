@@ -15,10 +15,10 @@ export const Route = createFileRoute("/messages")({
   validateSearch: z.object({ with: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: "Pesan — Mindcaster" },
-      { name: "description", content: "Kirim pesan langsung (DM) ke pengguna Mindcaster lain." },
-      { property: "og:title", content: "Pesan — Mindcaster" },
-      { property: "og:description", content: "Pesan langsung antar pengguna Mindcaster." },
+      { title: "Messages — Mindcaster" },
+      { name: "description", content: "Send direct messages (DMs) to other Mindcaster users." },
+      { property: "og:title", content: "Messages — Mindcaster" },
+      { property: "og:description", content: "Direct messages between Mindcaster users." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -31,7 +31,7 @@ const PROFILE_COLS = "id, display_name, username, bio, avatar_url, created_at";
 
 function MessagesPage() {
   const { with: other } = Route.useSearch();
-  return <AppShell title="Pesan">{(u) => (other ? <Thread user={u} otherId={other} /> : <Inbox user={u} />)}</AppShell>;
+  return <AppShell title="Messages">{(u) => (other ? <Thread user={u} otherId={other} /> : <Inbox user={u} />)}</AppShell>;
 }
 
 function Inbox({ user }: { user: User }) {
@@ -53,7 +53,7 @@ function Inbox({ user }: { user: User }) {
   if (!convos) return null;
   if (convos.length === 0) return (
     <div className="py-10 text-center text-sm text-muted-foreground">
-      Belum ada percakapan. <Link to="/discover" className="font-semibold text-link underline">Cari orang di Discover</Link> untuk mulai DM.
+      No conversations yet. <Link to="/discover" className="font-semibold text-link underline">Find people on Discover</Link> to start a DM.
     </div>
   );
   return (
@@ -64,7 +64,7 @@ function Inbox({ user }: { user: User }) {
             <Avatar profile={profile} />
             <span className="min-w-0 flex-1">
               <span className="flex justify-between gap-2"><span className="flex items-center gap-1 truncate text-sm font-semibold">{displayName(profile)}<IdentityBadges username={profile.username} /></span><span className="text-xs text-muted-foreground">{timeAgo(last.created_at)}</span></span>
-              <span className="block truncate text-sm text-muted-foreground">{last.sender_id === user.id ? "Anda: " : ""}{last.content}</span>
+              <span className="block truncate text-sm text-muted-foreground">{last.sender_id === user.id ? "You: " : ""}{last.content}</span>
             </span>
           </Link>
         </li>
@@ -103,11 +103,11 @@ function Thread({ user, otherId }: { user: User; otherId: string }) {
     setDraft(""); void load();
   }
 
-  if (otherId === user.id) return <p className="text-sm text-muted-foreground">Anda tidak bisa mengirim pesan ke diri sendiri.</p>;
+  if (otherId === user.id) return <p className="text-sm text-muted-foreground">You can't message yourself.</p>;
   return (
     <div className="glass-panel flex min-h-[70vh] flex-col rounded-[24px] border border-surface/80">
       <div className="flex items-center gap-3 border-b border-border/50 p-3">
-        <Link to="/messages" search={{}} aria-label="Kembali" className="grid size-9 place-items-center rounded-full hover:bg-muted"><ArrowLeft className="size-4" /></Link>
+        <Link to="/messages" search={{}} aria-label="Back" className="grid size-9 place-items-center rounded-full hover:bg-muted"><ArrowLeft className="size-4" /></Link>
         <Avatar profile={other} size={36} />
         <Link to="/profile" search={{ id: otherId }} className="min-w-0">
           <p className="flex items-center gap-1 truncate text-sm font-semibold">{displayName(other)}<IdentityBadges username={other?.username} /></p>
@@ -115,7 +115,7 @@ function Thread({ user, otherId }: { user: User; otherId: string }) {
         </Link>
       </div>
       <div className="flex-1 space-y-2 overflow-y-auto p-4">
-        {msgs.length === 0 && <p className="text-center text-sm text-muted-foreground">Kirim pesan pertama.</p>}
+        {msgs.length === 0 && <p className="text-center text-sm text-muted-foreground">Send the first message.</p>}
         {msgs.map((m) => {
           const mine = m.sender_id === user.id;
           return (
@@ -128,8 +128,8 @@ function Thread({ user, otherId }: { user: User; otherId: string }) {
       </div>
       {error && <p role="alert" className="px-4 text-sm text-destructive">{error}</p>}
       <form onSubmit={send} className="flex gap-2 border-t border-border/50 p-3">
-        <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={1000} placeholder="Tulis pesan…" className="h-10 flex-1 rounded-full border border-border/60 bg-surface/75 px-4 text-sm outline-none focus:border-primary" />
-        <Button type="submit" size="icon" aria-label="Kirim" disabled={!draft.trim()}><Send className="size-4" /></Button>
+        <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={1000} placeholder="Write a message…" className="h-10 flex-1 rounded-full border border-border/60 bg-surface/75 px-4 text-sm outline-none focus:border-primary" />
+        <Button type="submit" size="icon" aria-label="Send" disabled={!draft.trim()}><Send className="size-4" /></Button>
       </form>
     </div>
   );

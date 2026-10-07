@@ -9,7 +9,7 @@ const TTL = { alerts: 15_000, thesis: 60_000, leaderboard: 60_000 } as const;
 
 async function fomoGet(path: string) {
   const keys = (process.env["FOMO_API_KEYS"] ?? "").split(/[\s,]+/).filter(Boolean);
-  if (!keys.length) throw new Error("FOMO belum dikonfigurasi.");
+  if (!keys.length) throw new Error("FOMO is not configured.");
   for (let i = 0; i < keys.length; i++) {
     const key = keys[(cursor + i) % keys.length]!;
     if ((cooldown.get(key) ?? 0) > Date.now()) continue;
@@ -19,10 +19,10 @@ async function fomoGet(path: string) {
       continue;
     }
     cursor = (cursor + i + 1) % keys.length;
-    if (!res.ok) { console.error("FOMO", res.status, await res.text().catch(() => "")); throw new Error("Data FOMO sedang tidak tersedia."); }
+    if (!res.ok) { console.error("FOMO", res.status, await res.text().catch(() => "")); throw new Error("FOMO data is currently unavailable."); }
     return res.json();
   }
-  throw new Error("Semua key FOMO sedang mencapai batas. Coba sebentar lagi.");
+  throw new Error("All FOMO keys are rate-limited. Please try again shortly.");
 }
 
 export const getFomo = createServerFn({ method: "GET" })

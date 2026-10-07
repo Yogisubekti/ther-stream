@@ -11,9 +11,9 @@ export const Route = createFileRoute("/post")({
   head: () => ({
     meta: [
       { title: "Postingan — Mindcaster" },
-      { name: "description", content: "Lihat postingan yang dibagikan di Mindcaster." },
+      { name: "description", content: "View a post shared on Mindcaster." },
       { property: "og:title", content: "Postingan — Mindcaster" },
-      { property: "og:description", content: "Postingan yang dibagikan di Mindcaster — Where Ideas Become Onchain." },
+      { property: "og:description", content: "A post shared on Mindcaster — Where Ideas Become Onchain." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -31,14 +31,14 @@ function PostView({ userId, id }: { userId: string; id: string | undefined }) {
   const [error, setError] = useState<string | null>(null);
   const load = useCallback(async () => {
     if (!id) return setPost(null);
-    try { setPost((await fetchPosts({ ids: [id] }))[0] ?? null); } catch (e) { setError(e instanceof Error ? e.message : "Gagal memuat"); }
+    try { setPost((await fetchPosts({ ids: [id] }))[0] ?? null); } catch (e) { setError(e instanceof Error ? e.message : "Failed to load"); }
   }, [id]);
   useEffect(() => { void load(); }, [load]);
   return (
     <div className="space-y-3">
       {error && <p className="text-sm text-destructive">{error}</p>}
-      {post === undefined && <p className="py-6 text-center text-sm text-muted-foreground">Memuat…</p>}
-      {post === null && <p className="py-6 text-center text-sm text-muted-foreground">Postingan tidak ditemukan.</p>}
+      {post === undefined && <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>}
+      {post === null && <p className="py-6 text-center text-sm text-muted-foreground">Post not found.</p>}
       {post && <PostCard post={post} userId={userId} onChange={load} onError={setError} />}
     </div>
   );
