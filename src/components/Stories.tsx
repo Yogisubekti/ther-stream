@@ -115,25 +115,31 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
       </section>
 
       {cur && open && (
-        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90">
-          <div className="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-[600px] gap-1 px-3 pt-3">
-            {groups[open.g]!.items.map((s, i) => <span key={s.id} className={`h-1 flex-1 rounded-full ${i <= open.i ? "bg-background" : "bg-background/30"}`} />)}
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="relative flex h-full w-full max-w-[480px] items-center justify-center overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
+            {cur.media_type === "video"
+              ? <video key={cur.id} src={cur.media_url} autoPlay playsInline onEnded={next} className="h-full w-full object-cover" />
+              : <img key={cur.id} src={cur.media_url} alt="Story" className="h-full w-full object-cover" />}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/70 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute inset-x-0 top-0 z-10 flex gap-1 px-3 pt-3">
+              {groups[open.g]!.items.map((s, i) => <span key={s.id} className={`h-1 flex-1 rounded-full ${i <= open.i ? "bg-white" : "bg-white/40"}`} />)}
+            </div>
+            <div className="absolute inset-x-0 top-6 z-10 flex items-center gap-2.5 px-3 text-white">
+              <span className="rounded-full ring-2 ring-white/70"><Avatar profile={groups[open.g]!.author} size={40} /></span>
+              <span className="flex min-w-0 flex-col">
+                <span className="truncate text-sm font-semibold drop-shadow">{cur.author_id === userId ? "Your story" : displayName(groups[open.g]!.author)}</span>
+                <span className="text-xs text-white/80 drop-shadow">{timeAgo(cur.created_at)}</span>
+              </span>
+              <span className="ml-auto flex gap-1">
+                {cur.author_id === userId && <button aria-label="Delete story" onClick={() => { if (confirm("Delete this story?")) void remove(cur.id); }} className="grid size-9 place-items-center rounded-full bg-black/30 hover:bg-black/50"><Trash2 className="size-5" /></button>}
+                <button aria-label="Close" onClick={() => setOpen(null)} className="grid size-9 place-items-center rounded-full bg-black/30 hover:bg-black/50"><X className="size-5" /></button>
+              </span>
+            </div>
           </div>
-          <div className="absolute inset-x-0 top-5 z-10 mx-auto flex max-w-[600px] items-center gap-2 px-3 text-background">
-            <Avatar profile={groups[open.g]!.author} size={32} />
-            <span className="text-sm font-semibold">{displayName(groups[open.g]!.author)}</span>
-            <span className="text-xs opacity-70">{timeAgo(cur.created_at)}</span>
-            <span className="ml-auto flex gap-1">
-              {cur.author_id === userId && <button aria-label="Delete story" onClick={() => { if (confirm("Delete this story?")) void remove(cur.id); }} className="grid size-9 place-items-center rounded-full hover:bg-background/20"><Trash2 className="size-5" /></button>}
-              <button aria-label="Tutup" onClick={() => setOpen(null)} className="grid size-9 place-items-center rounded-full hover:bg-background/20"><X className="size-5" /></button>
-            </span>
-          </div>
-          {cur.media_type === "video"
-            ? <video key={cur.id} src={cur.media_url} autoPlay playsInline onEnded={next} className="max-h-full max-w-full" />
-            : <img key={cur.id} src={cur.media_url} alt="Story" className="max-h-full max-w-full object-contain" />}
-          <button aria-label="Berikutnya" onClick={next} className="absolute inset-y-20 right-0 w-1/2" />
-          <button aria-label="Sebelumnya" onClick={() => setOpen(open.i > 0 ? { g: open.g, i: open.i - 1 } : open.g > 0 ? { g: open.g - 1, i: 0 } : open)} className="absolute inset-y-20 left-0 w-1/2" />
-          <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-[600px] p-3 text-background">
+          <button aria-label="Next" onClick={next} className="absolute inset-y-20 right-0 z-[5] w-1/3" />
+          <button aria-label="Previous" onClick={() => setOpen(open.i > 0 ? { g: open.g, i: open.i - 1 } : open.g > 0 ? { g: open.g - 1, i: 0 } : open)} className="absolute inset-y-20 left-0 z-[5] w-1/3" />
+          <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-[480px] p-3 text-white">
             {sent && <p className="mb-2 text-center text-xs opacity-80">{sent}</p>}
             {cur.author_id === userId ? (
               <button onClick={() => void loadViewers()} className="mx-auto flex items-center gap-2 rounded-full bg-background/20 px-4 py-2 text-sm"><Eye className="size-4" />See who viewed</button>
