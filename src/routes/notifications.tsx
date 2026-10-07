@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Heart, Mail, MessageCircle, Repeat2, SmilePlus } from "lucide-react";
+import { AtSign, Heart, Mail, MessageCircle, Repeat2, SmilePlus } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
@@ -22,13 +22,14 @@ export const Route = createFileRoute("/notifications")({
   component: () => <AppShell title="Notifikasi">{() => <Notifications />}</AppShell>,
 });
 
-type Notif = { id: string; type: string; detail: string | null; read: boolean; created_at: string; actor_id: string; actor: Author };
+type Notif = { id: string; type: string; detail: string | null; read: boolean; created_at: string; actor_id: string; post_id: string | null; actor: Author };
 const META: Record<string, { icon: typeof Heart; text: string }> = {
   like: { icon: Heart, text: "liked your post" },
   repost: { icon: Repeat2, text: "reminded your post" },
   reaction: { icon: SmilePlus, text: "memberi reaksi" },
   comment: { icon: MessageCircle, text: "mengomentari:" },
   message: { icon: Mail, text: "sent a message:" },
+  mention: { icon: AtSign, text: "mentioned you:" },
 };
 
 function Notifications() {
