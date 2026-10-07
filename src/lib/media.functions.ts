@@ -5,6 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const TYPES = {
   "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif",
   "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov",
+  "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/x-m4a": "m4a", "audio/aac": "aac", "audio/wav": "wav", "audio/ogg": "ogg",
 } as const;
 export const MAX_UPLOAD = 10 * 1024 * 1024;
 
@@ -13,9 +14,9 @@ export const createUploadUrl = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
       kind: z.enum(["avatar", "post", "story"]),
-      contentType: z.enum(["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/webm", "video/quicktime"]),
+      contentType: z.enum(Object.keys(TYPES) as [keyof typeof TYPES, ...(keyof typeof TYPES)[]]),
       size: z.number().int().positive().max(MAX_UPLOAD),
-    }).refine((v) => v.kind === "story" || v.contentType.startsWith("image/"), "Video is only allowed for stories").parse(d),
+    }).refine((v) => v.kind === "story" || v.contentType.startsWith("image/"), "Video and music are only allowed for stories").parse(d),
   )
   .handler(async ({ data, context }) => {
     const accountId = process.env["CLOUDFLARE_R2_ACCOUNT_ID"];
