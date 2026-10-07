@@ -86,7 +86,7 @@ function Fomo() {
       <section className="glass-panel flex items-center gap-3 rounded-[24px] border border-surface/80 p-4">
         <img src={fomoLogo.url} alt="Logo Fomo" width={816} height={816} className="size-11 rounded-xl object-contain" />
         <div className="flex-1"><h2 className="font-display font-semibold">Fomo Family</h2><p className="text-xs text-muted-foreground">Live trader data from FOMO</p></div>
-        <button type="button" onClick={() => setNonce((n) => n + 1)} aria-label="Muat ulang" className="grid size-9 place-items-center rounded-full bg-surface/70"><RefreshCw className={`size-4 ${loading ? "animate-spin" : ""}`} /></button>
+        <button type="button" onClick={() => setNonce((n) => n + 1)} aria-label="Reload" className="grid size-9 place-items-center rounded-full bg-surface/70"><RefreshCw className={`size-4 ${loading ? "animate-spin" : ""}`} /></button>
       </section>
       <div className="glass-panel grid grid-cols-3 gap-1 rounded-full border border-surface/80 p-1">
         {TABS.map((t) => (

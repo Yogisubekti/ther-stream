@@ -68,7 +68,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                 <BrandLogo size={44} className="relative shadow-signal" />
             </div>
             <h1 className="font-display text-[22px] font-semibold leading-tight">Mindcaster</h1>
-            <span className="mt-2 inline-block rounded-full bg-primary/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">Beta akses</span>
+            <span className="mt-2 inline-block rounded-full bg-primary/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">{t("betaAccess")}</span>
             <p className="mt-1.5 text-sm font-medium text-muted-foreground">Where Ideas Become Onchain</p>
           </header>
           <AuthScreen />
