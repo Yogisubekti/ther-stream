@@ -132,7 +132,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
 
       {draft && (
         <div role="dialog" aria-modal="true" aria-label="New story" className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="relative flex h-[100dvh] w-full max-w-[480px] flex-col overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
+          <div className="relative flex h-full w-full max-w-[480px] flex-col overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
             <div className="flex shrink-0 flex-col gap-2 px-3 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] text-white">
               <div className="flex items-center justify-between gap-2">
                 <button type="button" onClick={() => { URL.revokeObjectURL(draft.preview); setDraft(null); }} className="shrink-0 rounded-full bg-black/40 px-4 py-2 text-sm">Cancel</button>
