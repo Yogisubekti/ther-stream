@@ -19,6 +19,8 @@ const copy = {
     illegal: "Konten ilegal", other: "Lainnya", postUpdated: "Postingan diperbarui", postDeleted: "Postingan dihapus",
     bookmarkRemoved: "Bookmark dihapus", postSaved: "Postingan disimpan", reportSent: "Laporan terkirim",
     reportThanks: "Terima kasih telah membantu menjaga komunitas.", reactionFailed: "Gagal memberi reaksi.",
+    editProfile: "Edit profil", posts: "Postingan", name: "Nama", bio: "Bio", changePhoto: "Ganti foto", remove: "Hapus",
+    noUsername: "Belum ada username", signOut: "Keluar", shareProfile: "Bagikan profil", betaAccess: "Beta akses", reload: "Muat ulang",
   },
   en: {
     home: "Home", discover: "Discover", notifications: "Notifications", messages: "Messages", profile: "Profile",
@@ -35,6 +37,8 @@ const copy = {
     illegal: "Illegal content", other: "Other", postUpdated: "Post updated", postDeleted: "Post deleted",
     bookmarkRemoved: "Bookmark removed", postSaved: "Post saved", reportSent: "Report sent",
     reportThanks: "Thank you for helping keep the community safe.", reactionFailed: "Could not add reaction.",
+    editProfile: "Edit profile", posts: "Posts", name: "Name", bio: "Bio", changePhoto: "Change photo", remove: "Remove",
+    noUsername: "No username yet", signOut: "Sign out", shareProfile: "Share profile", betaAccess: "Beta access", reload: "Reload",
   },
 } as const;
 
