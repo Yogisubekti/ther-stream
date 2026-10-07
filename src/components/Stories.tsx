@@ -29,7 +29,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
   }, [userId, onError]);
   useEffect(() => { void load(); }, [load]);
 
-  const [draft, setDraft] = useState<{ file: File; preview: string; music: File | null } | null>(null);
+  const [draft, setDraft] = useState<{ file: File; preview: string; music: File | null; musicUrl?: string } | null>(null);
   const [muted, setMuted] = useState(false);
   async function add() {
     if (!draft) return;
@@ -127,7 +127,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
             {draft.file.type.startsWith("video/")
               ? <video src={draft.preview} autoPlay loop muted={!!draft.music} playsInline className="h-full w-full object-cover" />
               : <img src={draft.preview} alt="Story preview" className="h-full w-full object-cover" />}
-            {draft.music && <audio key={draft.music.name} src={URL.createObjectURL(draft.music)} autoPlay loop />}
+            {draft.music && <audio key={draft.music.name} src={draft.musicUrl} autoPlay loop />}
             <div className="absolute inset-x-0 top-0 flex justify-between bg-gradient-to-b from-black/70 to-transparent p-3 text-white">
               <button type="button" onClick={() => { URL.revokeObjectURL(draft.preview); setDraft(null); }} className="rounded-full bg-black/40 px-3 py-1.5 text-sm">Cancel</button>
             </div>
@@ -136,7 +136,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
                 <span aria-hidden>🎵</span>
                 <span className="min-w-0 flex-1 truncate">{draft.music ? draft.music.name : "Add music (MP3, M4A…)"}</span>
                 {draft.music && <button type="button" onClick={(e) => { e.preventDefault(); setDraft({ ...draft, music: null }); }} className="text-xs underline">Remove</button>}
-                <input type="file" accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg,.mp3,.m4a" className="sr-only" onChange={(e) => { const m = e.target.files?.[0]; e.target.value = ""; if (m) setDraft({ ...draft, music: m }); }} />
+                <input type="file" accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg,.mp3,.m4a" className="sr-only" onChange={(e) => { const m = e.target.files?.[0]; e.target.value = ""; if (m) setDraft({ ...draft, music: m, musicUrl: URL.createObjectURL(m) }); }} />
               </label>
               <button type="button" disabled={busy} onClick={() => void add()} className="rounded-full bg-primary py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy ? "Uploading…" : "Share to story"}</button>
             </div>
