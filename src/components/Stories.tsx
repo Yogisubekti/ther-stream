@@ -39,7 +39,6 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
     setSearching(true);
     try { setResults(await searchMusic({ data: { q: mq } })); } catch (e) { onError((e as Error).message); } finally { setSearching(false); }
   }
-  const _unused = useState<null>(null);
   const [muted, setMuted] = useState(false);
   async function add() {
     if (!draft) return;
