@@ -16,8 +16,8 @@ import type { Profile } from "@/lib/social";
 const NAV = [
   { to: "/", label: "Home", icon: Home },
   { to: "/discover", label: "Discover", icon: Compass },
-  { to: "/notifications", label: "Notifikasi", icon: Bell },
-  { to: "/messages", label: "Pesan", icon: Mail },
+  { to: "/notifications", label: "Notifications", icon: Bell },
+  { to: "/messages", label: "Messages", icon: Mail },
   { to: "/fomo", label: "Fomo" },
 ] as const;
 
@@ -83,7 +83,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
             <ul className="mx-auto grid h-16 max-w-[600px] grid-cols-5">
               {NAV.map(({ to, label, ...rest }) => {
                 const Icon = "icon" in rest ? rest.icon : null;
-                const translatedLabel = label === "Home" ? t("home") : label === "Discover" ? t("discover") : label === "Notifikasi" ? t("notifications") : label === "Pesan" ? t("messages") : label;
+                const translatedLabel = label === "Home" ? t("home") : label === "Discover" ? t("discover") : label === "Notifications" ? t("notifications") : label === "Messages" ? t("messages") : label;
                 return (
                   <li key={to}>
                     <Link to={to} activeOptions={{ exact: true, includeSearch: false }} aria-label={translatedLabel} title={translatedLabel} className="group flex h-full items-center justify-center text-muted-foreground data-[status=active]:text-foreground">

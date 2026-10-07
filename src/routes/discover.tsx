@@ -15,9 +15,9 @@ export const Route = createFileRoute("/discover")({
   head: () => ({
     meta: [
       { title: "Discover — Mindcaster" },
-      { name: "description", content: "Temukan pengguna dan postingan yang sedang ramai di Mindcaster." },
+      { name: "description", content: "Find people and trending posts on Mindcaster." },
       { property: "og:title", content: "Discover — Mindcaster" },
-      { property: "og:description", content: "Temukan pengguna dan postingan yang sedang ramai di Mindcaster." },
+      { property: "og:description", content: "Find people and trending posts on Mindcaster." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -54,11 +54,11 @@ function Discover({ user }: { user: User }) {
       <DiscoverBanners />
       <label className="relative block">
         <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari nama atau @username" className="glass-panel h-11 w-full rounded-full border border-surface/80 pl-10 pr-4 text-sm outline-none focus:border-primary" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or @username" className="glass-panel h-11 w-full rounded-full border border-surface/80 pl-10 pr-4 text-sm outline-none focus:border-primary" />
       </label>
       <section className="glass-panel rounded-[24px] border border-surface/80 p-4">
-        <h2 className="mb-3 font-display text-sm font-semibold">{q ? "Hasil pencarian" : "Pengguna baru"}</h2>
-        {people.length === 0 && <p className="text-sm text-muted-foreground">Tidak ada pengguna ditemukan.</p>}
+        <h2 className="mb-3 font-display text-sm font-semibold">{q ? "Search results" : "New users"}</h2>
+        {people.length === 0 && <p className="text-sm text-muted-foreground">No users found.</p>}
         <ul className="space-y-3">
           {people.map((p) => (
             <li key={p.id} className="flex items-center gap-3">
@@ -69,12 +69,12 @@ function Discover({ user }: { user: User }) {
                   <span className="block truncate text-xs text-muted-foreground">{handle(p) ?? p.bio ?? ""}</span>
                 </span>
               </Link>
-              <Link to="/messages" search={{ with: p.id }} className="rounded-full border border-border/60 bg-surface/70 px-3 py-1.5 text-xs font-semibold">Pesan</Link>
+              <Link to="/messages" search={{ with: p.id }} className="rounded-full border border-border/60 bg-surface/70 px-3 py-1.5 text-xs font-semibold">Message</Link>
             </li>
           ))}
         </ul>
       </section>
-      <h2 className="px-1 pt-2 font-display text-sm font-semibold">Sedang ramai</h2>
+      <h2 className="px-1 pt-2 font-display text-sm font-semibold">Trending</h2>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       {trending.map((p) => <PostCard key={p.id} post={p} userId={user.id} onChange={load} onError={setError} />)}
     </>

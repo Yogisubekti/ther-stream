@@ -37,7 +37,7 @@ export function IdentityBadges({ username }: { username?: string | null | undefi
   const sub = map.get(key);
   if (!CURATED.has(key) && !sub) return null;
   return (
-    <span className="inline-flex shrink-0 items-center gap-0.5" aria-label="Akun terverifikasi Mindcaster" title="Akun terverifikasi Mindcaster">
+    <span className="inline-flex shrink-0 items-center gap-0.5" aria-label="Verified Mindcaster account" title="Verified Mindcaster account">
       <BadgeCheck className="size-4 fill-primary text-primary-foreground" />
       {CURATED.has(key) && <BrandLogo size={16} className="rounded-full ring-1 ring-primary/40" />}
       {sub?.og && <img src={ogBadge.url} alt="OG" title="OG member" width={16} height={16} className="size-4 rounded-full ring-1 ring-primary/40" />}
