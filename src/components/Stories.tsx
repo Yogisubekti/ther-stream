@@ -132,30 +132,33 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
 
       {draft && (
         <div role="dialog" aria-modal="true" aria-label="New story" className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="relative flex h-full w-full max-w-[480px] flex-col overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
-            {draft.file.type.startsWith("video/")
-              ? <video src={draft.preview} autoPlay loop muted={!!draft.music} playsInline className="h-full w-full object-cover" />
-              : <img src={draft.preview} alt="Story preview" className="h-full w-full object-cover" />}
-            {draft.music && <audio key={draft.music.id} src={draft.music.preview} autoPlay loop />}
-            <div className="absolute inset-x-0 top-0 flex justify-between bg-gradient-to-b from-black/70 to-transparent p-3 text-white">
-              <button type="button" onClick={() => { URL.revokeObjectURL(draft.preview); setDraft(null); }} className="rounded-full bg-black/40 px-3 py-1.5 text-sm">Cancel</button>
+          <div className="relative flex h-[100dvh] w-full max-w-[480px] flex-col overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
+            <div className="relative min-h-0 flex-1">
+              {draft.file.type.startsWith("video/")
+                ? <video src={draft.preview} autoPlay loop muted={!!draft.music} playsInline className="h-full w-full object-contain" />
+                : <img src={draft.preview} alt="Story preview" className="h-full w-full object-contain" />}
+              {draft.music && <audio key={draft.music.id} src={draft.music.preview} autoPlay loop />}
+              <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 bg-gradient-to-b from-black/70 to-transparent p-3 pb-6 text-white">
+                <button type="button" onClick={() => { URL.revokeObjectURL(draft.preview); setDraft(null); }} className="shrink-0 rounded-full bg-black/40 px-3 py-1.5 text-sm">Cancel</button>
+                <button type="button" disabled={busy} onClick={() => void add()} className="shrink-0 rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy ? "Uploading…" : "Share"}</button>
+              </div>
             </div>
-            <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 bg-gradient-to-t from-black/80 to-transparent p-4 text-white">
+            <div className="flex flex-col gap-2 bg-black px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 text-white">
               {draft.music ? (
                 <div className="flex items-center gap-2 rounded-full bg-white/15 py-1.5 pl-1.5 pr-4 text-sm backdrop-blur">
-                  <img src={draft.music.artwork} alt="" className="size-8 rounded-full" />
+                  <img src={draft.music.artwork} alt="" className="size-8 shrink-0 rounded-full" />
                   <span className="min-w-0 flex-1 truncate">🎵 {draft.music.title} · {draft.music.artist}</span>
-                  <button type="button" onClick={() => setDraft({ ...draft, music: null })} className="text-xs underline">Change</button>
+                  <button type="button" onClick={() => setDraft({ ...draft, music: null })} className="shrink-0 text-xs underline">Change</button>
                 </div>
               ) : (
                 <>
                   {results && (
-                    <ul className="max-h-60 overflow-y-auto rounded-2xl bg-black/60 p-1 backdrop-blur">
+                    <ul className="max-h-40 overflow-y-auto rounded-2xl bg-white/10 p-1 backdrop-blur">
                       {results.length === 0 && <li className="p-3 text-sm text-white/70">No songs found.</li>}
                       {results.map((t) => (
                         <li key={t.id}>
                           <button type="button" onClick={() => { setDraft({ ...draft, music: t }); setResults(null); }} className="flex w-full items-center gap-2 rounded-xl p-2 text-left hover:bg-white/10">
-                            <img src={t.artwork} alt="" className="size-10 rounded-md" />
+                            <img src={t.artwork} alt="" className="size-10 shrink-0 rounded-md" />
                             <span className="min-w-0"><span className="block truncate text-sm font-medium">{t.title}</span><span className="block truncate text-xs text-white/70">{t.artist}</span></span>
                           </button>
                         </li>
@@ -165,11 +168,10 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
                   <form onSubmit={(e) => { e.preventDefault(); void findMusic(); }} className="flex items-center gap-2 rounded-full bg-white/15 py-1.5 pl-4 pr-1.5 text-sm backdrop-blur">
                     <span aria-hidden>🎵</span>
                     <input value={mq} onChange={(e) => setMq(e.target.value)} placeholder="Search music (song or artist)" aria-label="Search music" className="min-w-0 flex-1 bg-transparent placeholder:text-white/60 focus:outline-none" />
-                    <button type="submit" disabled={searching} className="rounded-full bg-white/20 px-3 py-1 text-xs">{searching ? "…" : "Search"}</button>
+                    <button type="submit" disabled={searching} className="shrink-0 rounded-full bg-white/20 px-3 py-1 text-xs">{searching ? "…" : "Search"}</button>
                   </form>
                 </>
               )}
-              <button type="button" disabled={busy} onClick={() => void add()} className="rounded-full bg-primary py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy ? "Uploading…" : "Share to story"}</button>
             </div>
           </div>
         </div>
