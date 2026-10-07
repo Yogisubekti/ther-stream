@@ -3,10 +3,10 @@ import { Eye, Plus, Send, Trash2, X } from "lucide-react";
 
 import { Avatar } from "@/components/Avatar";
 import { supabase } from "@/integrations/supabase/client";
-import { uploadImage } from "@/lib/upload";
+import { uploadImage, uploadAudio } from "@/lib/upload";
 import { displayName, timeAgo, type Author } from "@/lib/social";
 
-type Story = { id: string; author_id: string; media_url: string; media_type: "image" | "video"; created_at: string; author: Author };
+type Story = { id: string; author_id: string; media_url: string; media_type: "image" | "video"; music_url: string | null; music_title: string | null; created_at: string; author: Author };
 type Group = { author: Author; authorId: string; items: Story[] };
 
 export function Stories({ userId, onError }: { userId: string; onError: (m: string) => void }) {
@@ -16,7 +16,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.from("stories" as never)
-      .select("id, author_id, media_url, media_type, created_at, author:profiles!stories_author_id_fkey(id, display_name, username, avatar_url)")
+      .select("id, author_id, media_url, media_type, music_url, music_title, created_at, author:profiles!stories_author_id_fkey(id, display_name, username, avatar_url)")
       .gt("expires_at", new Date().toISOString()).order("created_at", { ascending: true });
     if (error) return onError(error.message);
     const map = new Map<string, Group>();
@@ -29,12 +29,19 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
   }, [userId, onError]);
   useEffect(() => { void load(); }, [load]);
 
-  async function add(file: File) {
+  const [draft, setDraft] = useState<{ file: File; preview: string; music: File | null; musicUrl?: string } | null>(null);
+  const [muted, setMuted] = useState(false);
+  async function add() {
+    if (!draft) return;
+    const { file, music } = draft;
     setBusy(true);
     try {
       const media_url = await uploadImage(file, "story");
-      const { error } = await supabase.from("stories" as never).insert({ author_id: userId, media_url, media_type: file.type.startsWith("video/") ? "video" : "image" } as never);
+      const music_url = music ? await uploadAudio(music) : null;
+      const music_title = music ? music.name.replace(/\.[^.]+$/, "").slice(0, 120) : null;
+      const { error } = await supabase.from("stories" as never).insert({ author_id: userId, media_url, media_type: file.type.startsWith("video/") ? "video" : "image", music_url, music_title } as never);
       if (error) throw error;
+      URL.revokeObjectURL(draft.preview); setDraft(null);
       await load();
     } catch (e) { onError((e as Error).message); } finally { setBusy(false); }
   }
@@ -103,8 +110,8 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
       <section aria-label="Story" className="glass-panel flex gap-3 overflow-x-auto rounded-[24px] border border-surface/80 p-3">
         <label className={`flex w-16 shrink-0 cursor-pointer flex-col items-center gap-1 ${busy ? "opacity-50" : ""}`} aria-label="Add story">
           <span className="grid size-14 place-items-center rounded-full border-2 border-dashed border-primary/60 text-primary"><Plus className="size-6" /></span>
-          <span className="w-full truncate text-center text-[11px] text-muted-foreground">{busy ? "Mengunggah…" : "Story"}</span>
-          <input type="file" disabled={busy} accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) void add(f); }} />
+          <span className="w-full truncate text-center text-[11px] text-muted-foreground">{busy ? "Uploading…" : "Story"}</span>
+          <input type="file" disabled={busy} accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) setDraft({ file: f, preview: URL.createObjectURL(f), music: null }); }} />
         </label>
         {groups.map((g, gi) => (
           <button key={g.authorId} onClick={() => setOpen({ g: gi, i: 0 })} className="flex w-16 shrink-0 flex-col items-center gap-1">
@@ -114,12 +121,41 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
         ))}
       </section>
 
+      {draft && (
+        <div role="dialog" aria-modal="true" aria-label="New story" className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="relative flex h-full w-full max-w-[480px] flex-col overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
+            {draft.file.type.startsWith("video/")
+              ? <video src={draft.preview} autoPlay loop muted={!!draft.music} playsInline className="h-full w-full object-cover" />
+              : <img src={draft.preview} alt="Story preview" className="h-full w-full object-cover" />}
+            {draft.music && <audio key={draft.music.name} src={draft.musicUrl} autoPlay loop />}
+            <div className="absolute inset-x-0 top-0 flex justify-between bg-gradient-to-b from-black/70 to-transparent p-3 text-white">
+              <button type="button" onClick={() => { URL.revokeObjectURL(draft.preview); setDraft(null); }} className="rounded-full bg-black/40 px-3 py-1.5 text-sm">Cancel</button>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 bg-gradient-to-t from-black/80 to-transparent p-4 text-white">
+              <label className="flex cursor-pointer items-center gap-2 rounded-full bg-white/15 px-4 py-2.5 text-sm backdrop-blur">
+                <span aria-hidden>🎵</span>
+                <span className="min-w-0 flex-1 truncate">{draft.music ? draft.music.name : "Add music (MP3, M4A…)"}</span>
+                {draft.music && <button type="button" onClick={(e) => { e.preventDefault(); setDraft({ ...draft, music: null }); }} className="text-xs underline">Remove</button>}
+                <input type="file" accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg,.mp3,.m4a" className="sr-only" onChange={(e) => { const m = e.target.files?.[0]; e.target.value = ""; if (m) setDraft({ ...draft, music: m, musicUrl: URL.createObjectURL(m) }); }} />
+              </label>
+              <button type="button" disabled={busy} onClick={() => void add()} className="rounded-full bg-primary py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy ? "Uploading…" : "Share to story"}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {cur && open && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black">
           <div className="relative flex h-full w-full max-w-[480px] items-center justify-center overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
             {cur.media_type === "video"
-              ? <video key={cur.id} src={cur.media_url} autoPlay playsInline onEnded={next} className="h-full w-full object-cover" />
+              ? <video key={cur.id} src={cur.media_url} autoPlay playsInline muted={!!cur.music_url} onEnded={next} className="h-full w-full object-cover" />
               : <img key={cur.id} src={cur.media_url} alt="Story" className="h-full w-full object-cover" />}
+            {cur.music_url && <audio key={`m-${cur.id}`} src={cur.music_url} autoPlay loop muted={muted} />}
+            {cur.music_url && (
+              <button type="button" onClick={() => setMuted((m) => !m)} aria-label={muted ? "Unmute music" : "Mute music"} className="absolute left-3 top-20 z-20 flex max-w-[75%] items-center gap-1.5 rounded-full bg-black/45 px-3 py-1 text-xs text-white backdrop-blur">
+                <span aria-hidden>{muted ? "🔇" : "🎵"}</span><span className="truncate">{cur.music_title || "Music"}</span>
+              </button>
+            )}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/70 to-transparent" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/70 to-transparent" />
             <div className="absolute inset-x-0 top-0 z-10 flex gap-1 px-3 pt-3">

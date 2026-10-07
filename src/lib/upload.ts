@@ -13,3 +13,14 @@ export async function uploadImage(file: File, kind: "avatar" | "post" | "story")
   if (!res.ok) throw new Error("Upload failed. Please try again.");
   return publicUrl;
 }
+
+const AUD = ["audio/mpeg", "audio/mp4", "audio/x-m4a", "audio/aac", "audio/wav", "audio/ogg"] as const;
+export async function uploadAudio(file: File): Promise<string> {
+  const type = file.type || (file.name.toLowerCase().endsWith(".mp3") ? "audio/mpeg" : "");
+  if (!(AUD as readonly string[]).includes(type)) throw new Error("Music must be MP3, M4A, AAC, WAV, or OGG.");
+  if (file.size > 10 * 1024 * 1024) throw new Error("Maximum size is 10 MB.");
+  const { uploadUrl, publicUrl } = await createUploadUrl({ data: { kind: "story", contentType: type as (typeof AUD)[number], size: file.size } });
+  const res = await fetch(uploadUrl, { method: "PUT", body: file, headers: { "content-type": type } });
+  if (!res.ok) throw new Error("Upload failed. Please try again.");
+  return publicUrl;
+}
