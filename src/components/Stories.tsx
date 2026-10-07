@@ -147,11 +147,11 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
               <>
                 <div className="mb-2 flex justify-center gap-2">
                   {["❤️", "🔥", "😂", "😮", "👏", "🚀"].map((e) => (
-                    <button key={e} aria-label={`Reaksi ${e}`} onClick={() => void react(e)} className={`grid size-10 place-items-center rounded-full text-xl ${myReaction === e ? "bg-background/40" : "bg-background/10"}`}>{e}</button>
+                    <button key={e} aria-label={`React ${e}`} onClick={() => void react(e)} className={`grid size-10 place-items-center rounded-full text-xl ${myReaction === e ? "bg-white/30" : "bg-white/10"}`}>{e}</button>
                   ))}
                 </div>
                 <form onSubmit={(e) => { e.preventDefault(); void sendMsg(); }} className="flex gap-2">
-                  <input value={msg} onChange={(e) => setMsg(e.target.value)} maxLength={500} placeholder={`Reply to ${displayName(groups[open.g]!.author)}…`} className="h-11 flex-1 rounded-full border border-background/40 bg-transparent px-4 text-sm text-background placeholder:text-background/60 outline-none" />
+                  <input value={msg} onChange={(e) => setMsg(e.target.value)} maxLength={500} placeholder={`Reply to ${displayName(groups[open.g]!.author)}…`} className="h-11 flex-1 rounded-full border border-white/40 bg-black/20 px-4 text-sm text-white placeholder:text-white/60 outline-none" />
                   <button type="submit" aria-label="Send message" className="grid size-11 place-items-center rounded-full bg-primary text-primary-foreground"><Send className="size-4" /></button>
                 </form>
               </>
