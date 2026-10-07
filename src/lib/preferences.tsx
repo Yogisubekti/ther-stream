@@ -47,13 +47,11 @@ type PreferencesValue = {
 const PreferencesContext = createContext<PreferencesValue | null>(null);
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<LanguagePreference>("auto");
-  const [deviceLocale, setDeviceLocale] = useState<Locale>("id");
+  const [language, setLanguageState] = useState<LanguagePreference>("en");
 
   useEffect(() => {
     const savedLanguage = window.localStorage.getItem("mindcaster-language") as LanguagePreference | null;
     if (savedLanguage === "auto" || savedLanguage === "id" || savedLanguage === "en") setLanguageState(savedLanguage);
-    setDeviceLocale(window.navigator.language.toLowerCase().startsWith("id") ? "id" : "en");
   }, []);
 
   // Appearance is fixed to the light theme; the previous light/dark toggle was removed.
@@ -63,7 +61,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     window.localStorage.removeItem("mindcaster-theme");
   }, []);
 
-  const locale = language === "auto" ? deviceLocale : language;
+  const locale: Locale = language === "id" ? "id" : "en";
   useEffect(() => { document.documentElement.lang = locale; }, [locale]);
 
   const value = useMemo<PreferencesValue>(() => ({
