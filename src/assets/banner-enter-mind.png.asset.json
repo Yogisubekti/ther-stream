@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "4161c7da-4267-457b-8b32-87886afeeb65",
-  "project_id": "38f64c5d-983f-4cd8-afa5-25928c83c748",
-  "url": "/__l5e/assets-v1/4161c7da-4267-457b-8b32-87886afeeb65/banner-enter-mind.png",
-  "r2_key": "a/v1/38f64c5d-983f-4cd8-afa5-25928c83c748/4161c7da-4267-457b-8b32-87886afeeb65/banner-enter-mind.png",
-  "original_filename": "banner-enter-mind.png",
-  "size": 2069137,
   "content_type": "image/png",
-  "created_at": "2026-10-06T17:34:05Z"
+  "created_at": "2026-10-06T17:34:05Z",
+  "original_filename": "banner-enter-mind.png",
+  "project_id": "7e7b5e38-ce7c-4c7e-b7f7-918d7f76c639",
+  "r2_key": "a/v1/7e7b5e38-ce7c-4c7e-b7f7-918d7f76c639/4161c7da-4267-457b-8b32-87886afeeb65/banner-enter-mind.png",
+  "size": 2069137,
+  "url": "/__l5e/assets-v1/4161c7da-4267-457b-8b32-87886afeeb65/banner-enter-mind.png",
+  "version": 1
 }

@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "47f6d1c7-3746-4a71-bc94-66e4380bfaa2",
-  "project_id": "38f64c5d-983f-4cd8-afa5-25928c83c748",
-  "url": "/__l5e/assets-v1/47f6d1c7-3746-4a71-bc94-66e4380bfaa2/banner-og-nft.png",
-  "r2_key": "a/v1/38f64c5d-983f-4cd8-afa5-25928c83c748/47f6d1c7-3746-4a71-bc94-66e4380bfaa2/banner-og-nft.png",
-  "original_filename": "banner-og-nft.png",
-  "size": 2002935,
   "content_type": "image/png",
-  "created_at": "2026-10-06T17:34:01Z"
+  "created_at": "2026-10-06T17:34:01Z",
+  "original_filename": "banner-og-nft.png",
+  "project_id": "7e7b5e38-ce7c-4c7e-b7f7-918d7f76c639",
+  "r2_key": "a/v1/7e7b5e38-ce7c-4c7e-b7f7-918d7f76c639/47f6d1c7-3746-4a71-bc94-66e4380bfaa2/banner-og-nft.png",
+  "size": 2002935,
+  "url": "/__l5e/assets-v1/47f6d1c7-3746-4a71-bc94-66e4380bfaa2/banner-og-nft.png",
+  "version": 1
 }
