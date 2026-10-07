@@ -133,17 +133,11 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
       {draft && (
         <div role="dialog" aria-modal="true" aria-label="New story" className="fixed inset-0 z-50 flex items-center justify-center bg-black">
           <div className="relative flex h-[100dvh] w-full max-w-[480px] flex-col overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
-            <div className="relative min-h-0 flex-1">
-              {draft.file.type.startsWith("video/")
-                ? <video src={draft.preview} autoPlay loop muted={!!draft.music} playsInline className="h-full w-full object-contain" />
-                : <img src={draft.preview} alt="Story preview" className="h-full w-full object-contain" />}
-              {draft.music && <audio key={draft.music.id} src={draft.music.preview} autoPlay loop />}
-              <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 bg-gradient-to-b from-black/70 to-transparent p-3 pb-6 text-white">
-                <button type="button" onClick={() => { URL.revokeObjectURL(draft.preview); setDraft(null); }} className="shrink-0 rounded-full bg-black/40 px-3 py-1.5 text-sm">Cancel</button>
-                <button type="button" disabled={busy} onClick={() => void add()} className="shrink-0 rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy ? "Uploading…" : "Share"}</button>
+            <div className="flex shrink-0 flex-col gap-2 px-3 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] text-white">
+              <div className="flex items-center justify-between gap-2">
+                <button type="button" onClick={() => { URL.revokeObjectURL(draft.preview); setDraft(null); }} className="shrink-0 rounded-full bg-black/40 px-4 py-2 text-sm">Cancel</button>
+                <button type="button" disabled={busy} onClick={() => void add()} className="shrink-0 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy ? "Uploading…" : "Share"}</button>
               </div>
-            </div>
-            <div className="flex flex-col gap-2 bg-black px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 text-white">
               {draft.music ? (
                 <div className="flex items-center gap-2 rounded-full bg-white/15 py-1.5 pl-1.5 pr-4 text-sm backdrop-blur">
                   <img src={draft.music.artwork} alt="" className="size-8 shrink-0 rounded-full" />
@@ -152,8 +146,13 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
                 </div>
               ) : (
                 <>
+                  <form onSubmit={(e) => { e.preventDefault(); void findMusic(); }} className="flex items-center gap-2 rounded-full bg-white/15 py-2 pl-4 pr-1.5 text-sm backdrop-blur">
+                    <span aria-hidden>🎵</span>
+                    <input value={mq} onChange={(e) => setMq(e.target.value)} placeholder="Search music (song or artist)" aria-label="Search music" className="min-w-0 flex-1 bg-transparent placeholder:text-white/60 focus:outline-none" />
+                    <button type="submit" disabled={searching} className="shrink-0 rounded-full bg-white/20 px-4 py-1.5 text-xs">{searching ? "…" : "Search"}</button>
+                  </form>
                   {results && (
-                    <ul className="max-h-40 overflow-y-auto rounded-2xl bg-white/10 p-1 backdrop-blur">
+                    <ul className="max-h-44 overflow-y-auto rounded-2xl bg-white/10 p-1 backdrop-blur">
                       {results.length === 0 && <li className="p-3 text-sm text-white/70">No songs found.</li>}
                       {results.map((t) => (
                         <li key={t.id}>
@@ -165,13 +164,14 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
                       ))}
                     </ul>
                   )}
-                  <form onSubmit={(e) => { e.preventDefault(); void findMusic(); }} className="flex items-center gap-2 rounded-full bg-white/15 py-1.5 pl-4 pr-1.5 text-sm backdrop-blur">
-                    <span aria-hidden>🎵</span>
-                    <input value={mq} onChange={(e) => setMq(e.target.value)} placeholder="Search music (song or artist)" aria-label="Search music" className="min-w-0 flex-1 bg-transparent placeholder:text-white/60 focus:outline-none" />
-                    <button type="submit" disabled={searching} className="shrink-0 rounded-full bg-white/20 px-3 py-1 text-xs">{searching ? "…" : "Search"}</button>
-                  </form>
                 </>
               )}
+            </div>
+            <div className="relative min-h-0 flex-1">
+              {draft.file.type.startsWith("video/")
+                ? <video src={draft.preview} autoPlay loop muted={!!draft.music} playsInline className="h-full w-full object-contain" />
+                : <img src={draft.preview} alt="Story preview" className="h-full w-full object-contain" />}
+              {draft.music && <audio key={draft.music.id} src={draft.music.preview} autoPlay loop />}
             </div>
           </div>
         </div>
