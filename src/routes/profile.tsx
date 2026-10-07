@@ -91,7 +91,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
               {isMe ? (
                 <>
                   <Button variant="surface" size="sm" onClick={() => setEditing((v) => !v)}><Pencil className="size-4" />Edit profil</Button>
-                  <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOutEverywhere()}><LogOut className="size-4" /></Button>
+                  <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => void (async () => { await signOutEverywhere(); window.location.replace("/"); })()}><LogOut className="size-4" /></Button>
                 </>
               ) : (
                 <>
