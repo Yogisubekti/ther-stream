@@ -11,13 +11,15 @@
 - [x] Rebrand to Mindcaster with the supplied logo, verified account badges, and icon-only navigation
 - [x] Move post emoji reactions into the love control (tap for like, hold or open choices for other reactions)
 - [x] Verify build and signed-out desktop/mobile views
-- [ ] Verify signed-in browser flows — blocked until the requesting user signs in or identifies a test account
-- [ ] Move post usernames below names and add Follow controls
-- [ ] Add Indonesian/English language and light/dark appearance options
+- [x] Verify signed-in browser flows (profile, photo upload, sign-out) as ajudan328@gmail.com
+- [x] Move post usernames below names and add Follow controls
+- [x] English-primary interface with Indonesian as a selectable option
 - [x] Cloudflare R2 image uploads for posts and avatars (10 MB, JPG/PNG/WebP/GIF)
 - [x] FOMO page: Live Feed, Thesis, weekly PnL leaderboard with 20-key rotation
 - [x] Crypto-paid verification (Base/Polygon/BNB, USDC/USDT) + OG badge
 - [x] Cashtags and FOMO share-to-feed
+- [x] Sign-out clears both sessions and returns the browser to the entry page
+- [x] Add a dedicated Support & About page with private issue reports
 - [ ] Robinhood Chain USDG payment — needs token contract details
 - [ ] Scheduled database backup to R2
-- [x] Add a dedicated Support & About page with private issue reports
+- [ ] Add the live preview domain and localhost to Privy Allowed Domains — needs the user's Privy dashboard (currently only mindcasteriman16.lovable.app, www.mindcaster.xyz, lovable-stream-garden.lovable.app are allowed)
