@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { CalendarDays, Camera, Share2, LogOut, Mail, Pencil, WalletCards } from "lucide-react";
-import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { User } from "@supabase/supabase-js";
 
@@ -13,7 +12,6 @@ import { PostCard } from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
 import { uploadImage } from "@/lib/upload";
 import { supabase } from "@/integrations/supabase/client";
-import { linkWallet, walletMessage } from "@/lib/wallet.functions";
 import { profileLink, shareLink } from "@/lib/share";
 import { displayName, fetchPosts, handle, joined, resizeImage, short, type Post, type Profile } from "@/lib/social";
 
@@ -45,7 +43,6 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const link = useServerFn(linkWallet);
 
   const loadProfile = useCallback(async () => {
     const { data } = await supabase.from("profiles").select("id, display_name, username, bio, avatar_url, created_at").eq("id", profileId).maybeSingle();
@@ -67,18 +64,6 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
   useEffect(() => { void loadProfile(); }, [loadProfile]);
   useEffect(() => { void loadPosts(); }, [loadPosts]);
 
-  async function connectWallet() {
-    setError(null);
-    if (!window.ethereum) return setError("MetaMask tidak terdeteksi. Install untuk menghubungkan dompet.");
-    try {
-      const [address] = (await window.ethereum.request({ method: "eth_requestAccounts" })) as string[];
-      if (!address) return;
-      const issuedAt = new Date().toISOString();
-      const signature = (await window.ethereum.request({ method: "personal_sign", params: [walletMessage(user.id, address, issuedAt), address] })) as string;
-      await link({ data: { address, issuedAt, signature } });
-      void loadProfile();
-    } catch (err) { setError(err instanceof Error ? err.message : "Gagal menghubungkan dompet."); }
-  }
 
   if (!profile) return <p className="py-10 text-center text-sm text-muted-foreground">Memuat profil…</p>;
 
@@ -109,8 +94,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
           {profile.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
             <span className="flex items-center gap-1"><CalendarDays className="size-3.5" />Bergabung {joined(profile.created_at)}</span>
-            {profile.wallet_address ? <span className="flex items-center gap-1 text-primary"><WalletCards className="size-3.5" />{short(profile.wallet_address)} terverifikasi</span>
-              : isMe && <button onClick={connectWallet} className="flex items-center gap-1 font-semibold text-link"><WalletCards className="size-3.5" />Hubungkan MetaMask</button>}
+            {profile.wallet_address && <span className="flex items-center gap-1 text-primary"><WalletCards className="size-3.5" />{short(profile.wallet_address)}</span>}
           </div>
           <FollowStats profileId={profile.id} userId={user.id} />
         </div>
