@@ -86,6 +86,7 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
     } catch (e) { setError((e as Error).message); }
   }, [user.id, view]);
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => { const d = sessionStorage.getItem("mc-draft"); if (d) { setDraft(d.slice(0, 500)); sessionStorage.removeItem("mc-draft"); } }, []);
 
   async function createPost(e: FormEvent) {
     e.preventDefault();

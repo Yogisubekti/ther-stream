@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Share2 } from "lucide-react";
 
 import fomoLogo from "@/assets/fomo-logo.jpg.asset.json";
 import { AppShell } from "@/components/AppShell";
@@ -57,6 +57,14 @@ const token = (r: Row) => str(pick(r, "token.symbol", "symbol", "token_symbol", 
 
 function Fomo() {
   const fetchFomo = useServerFn(getFomo);
+  const navigate = useNavigate();
+  const share = (r: Row, text: string, side: string) => {
+    const tk = token(r).replace(/[^A-Za-z0-9]/g, "");
+    const val = pick(r, "value_usd", "amount_usd", "position_usd", "size_usd");
+    const draft = `📡 FOMO signal: ${trader(r)}${side ? ` ${side}` : ""}${tk ? ` $${tk.toUpperCase()}` : ""}${val !== undefined ? ` (${usd(val)})` : ""}${text ? `\n\n"${text.slice(0, 300)}"` : ""}`;
+    sessionStorage.setItem("mc-draft", draft);
+    void navigate({ to: "/" });
+  };
   const [tab, setTab] = useState<Tab>("alerts");
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,11 +114,12 @@ function Fomo() {
                 <div className="flex items-center gap-2 text-sm">
                   <span className="font-semibold">{trader(r)}</span>
                   {side && <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${side.includes("sell") ? "bg-destructive/20 text-destructive" : "bg-primary/20 text-primary"}`}>{side}</span>}
-                  {token(r) && <span className="font-semibold text-primary">${token(r)}</span>}
+                  {token(r) && <Link to="/cashtag" search={{ s: token(r).toUpperCase() }} className="font-semibold text-primary hover:underline">${token(r)}</Link>}
                   <span className="ml-auto text-xs text-muted-foreground">{str(pick(r, "chain"))}</span>
                 </div>
                 {text && <p className="mt-2 whitespace-pre-wrap break-words text-sm">{text}</p>}
                 <p className="mt-2 text-xs text-muted-foreground">{[pick(r, "value_usd", "amount_usd", "position_usd", "size_usd") !== undefined ? usd(pick(r, "value_usd", "amount_usd", "position_usd", "size_usd")) : "", when(pick(r, "created_at", "timestamp", "time"))].filter(Boolean).join(" · ")}</p>
+                <button type="button" onClick={() => share(r, text, side)} className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface/70 px-3 py-1 text-xs font-semibold text-primary"><Share2 className="size-3.5" />Share to feed</button>
               </article>
             );
           })}

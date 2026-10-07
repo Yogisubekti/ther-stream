@@ -4,6 +4,7 @@ import { Bookmark, ChevronDown, Share2, Flag, Heart, MessageCircle, MoreHorizont
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/Avatar";
+import { RichText } from "@/components/RichText";
 import { IdentityBadges } from "@/components/IdentityBadges";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -140,7 +141,7 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
           </div>
           {handle(p.author) && <Link to="/profile" search={{ id: p.author_id }} className="block text-xs text-muted-foreground">{handle(p.author)}</Link>}
           {p.author?.wallet_address && <span className="text-[11px] text-primary">{short(p.author.wallet_address)}</span>}
-          <p className="mt-1.5 whitespace-pre-wrap break-words text-sm">{p.content}</p>
+          <p className="mt-1.5 whitespace-pre-wrap break-words text-sm"><RichText text={p.content} /></p>
           {p.image_url && <img src={p.image_url} alt="" loading="lazy" className="mt-2 max-h-[480px] w-full rounded-2xl border border-border/60 object-cover" />}
         </div>
         <DropdownMenu>
@@ -183,7 +184,7 @@ export function PostCard({ post: p, userId, onChange, onError }: { post: Post; u
           {p.post_comments.map((c) => (
             <div key={c.id} className="flex items-start gap-2 text-sm">
               <Avatar profile={c.author} size={28} />
-              <p className="flex-1 break-words"><span className="inline-flex items-center gap-1 font-semibold">{displayName(c.author)}<IdentityBadges username={c.author?.username} /></span> {c.content}</p>
+              <p className="flex-1 break-words"><span className="inline-flex items-center gap-1 font-semibold">{displayName(c.author)}<IdentityBadges username={c.author?.username} /></span> <RichText text={c.content} /></p>
                {c.author_id === userId && <Button variant="ghost" size="icon" className="size-7" aria-label={t("deleteComment")} onClick={() => run(supabase.from("post_comments").delete().eq("id", c.id))}><Trash2 className="size-3.5" /></Button>}
             </div>
           ))}
