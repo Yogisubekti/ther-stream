@@ -17,6 +17,7 @@
 - [x] Cloudflare R2 image uploads for posts and avatars (10 MB, JPG/PNG/WebP/GIF)
 - [x] FOMO page: Live Feed, Thesis, weekly PnL leaderboard with 20-key rotation
 - [x] Crypto-paid verification (Base/Polygon/BNB, USDC/USDT) + OG badge
+- [x] Cashtags and FOMO share-to-feed
 - [ ] Robinhood Chain USDG payment — needs token contract details
 - [ ] Scheduled database backup to R2
 - [x] Add a dedicated Support & About page with private issue reports

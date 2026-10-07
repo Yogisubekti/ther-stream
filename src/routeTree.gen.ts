@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CashtagRouteImport } from './routes/cashtag'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as FomoRouteImport } from './routes/fomo'
 import { Route as MessagesRouteImport } from './routes/messages'
@@ -22,6 +23,11 @@ import { Route as VerifyRouteImport } from './routes/verify'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CashtagRoute = CashtagRouteImport.update({
+  id: '/cashtag',
+  path: '/cashtag',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -67,6 +73,7 @@ const VerifyRoute = VerifyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cashtag': typeof CashtagRoute
   '/discover': typeof DiscoverRoute
   '/fomo': typeof FomoRoute
   '/messages': typeof MessagesRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cashtag': typeof CashtagRoute
   '/discover': typeof DiscoverRoute
   '/fomo': typeof FomoRoute
   '/messages': typeof MessagesRoute
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cashtag': typeof CashtagRoute
   '/discover': typeof DiscoverRoute
   '/fomo': typeof FomoRoute
   '/messages': typeof MessagesRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cashtag'
     | '/discover'
     | '/fomo'
     | '/messages'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cashtag'
     | '/discover'
     | '/fomo'
     | '/messages'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/cashtag'
     | '/discover'
     | '/fomo'
     | '/messages'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CashtagRoute: typeof CashtagRoute
   DiscoverRoute: typeof DiscoverRoute
   FomoRoute: typeof FomoRoute
   MessagesRoute: typeof MessagesRoute
@@ -154,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cashtag': {
+      id: '/cashtag'
+      path: '/cashtag'
+      fullPath: '/cashtag'
+      preLoaderRoute: typeof CashtagRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -217,6 +237,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CashtagRoute: CashtagRoute,
   DiscoverRoute: DiscoverRoute,
   FomoRoute: FomoRoute,
   MessagesRoute: MessagesRoute,
