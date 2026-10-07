@@ -78,8 +78,15 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   return <PreferencesContext.Provider value={value}>{children}</PreferencesContext.Provider>;
 }
 
+// Fallback keeps the app rendering (English default) if the provider is briefly
+// missing, e.g. after a hot reload creates a fresh context instance.
+const fallbackPreferences: PreferencesValue = {
+  language: "en",
+  setLanguage: (next) => { if (typeof window !== "undefined") { window.localStorage.setItem("mindcaster-language", next); window.location.reload(); } },
+  locale: "en",
+  t: (key) => copy.en[key],
+};
+
 export function usePreferences() {
-  const value = useContext(PreferencesContext);
-  if (!value) throw new Error("usePreferences must be used inside PreferencesProvider");
-  return value;
+  return useContext(PreferencesContext) ?? fallbackPreferences;
 }
