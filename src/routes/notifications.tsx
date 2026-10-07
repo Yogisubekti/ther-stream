@@ -22,7 +22,7 @@ export const Route = createFileRoute("/notifications")({
   component: () => <AppShell title="Notifikasi">{() => <Notifications />}</AppShell>,
 });
 
-type Notif = { id: string; type: string; detail: string | null; read: boolean; created_at: string; actor_id: string; actor: Author };
+type Notif = { id: string; type: string; detail: string | null; read: boolean; created_at: string; actor_id: string; post_id: string | null; actor: Author };
 const META: Record<string, { icon: typeof Heart; text: string }> = {
   like: { icon: Heart, text: "liked your post" },
   repost: { icon: Repeat2, text: "reminded your post" },
