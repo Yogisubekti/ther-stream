@@ -11,6 +11,7 @@ import { FollowStats, ProfileFollowButton } from "@/components/FollowLists";
 import { PostCard } from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
 import { uploadImage } from "@/lib/upload";
+import { signOutEverywhere } from "@/lib/sign-out";
 import { supabase } from "@/integrations/supabase/client";
 import { profileLink, shareLink } from "@/lib/share";
 import { displayName, fetchPosts, handle, joined, resizeImage, short, type Post, type Profile } from "@/lib/social";
@@ -78,7 +79,7 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
               {isMe ? (
                 <>
                   <Button variant="surface" size="sm" onClick={() => setEditing((v) => !v)}><Pencil className="size-4" />Edit profil</Button>
-                  <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => supabase.auth.signOut()}><LogOut className="size-4" /></Button>
+                  <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOutEverywhere()}><LogOut className="size-4" /></Button>
                 </>
               ) : (
                 <>

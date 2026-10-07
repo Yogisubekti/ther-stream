@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { exchangePrivyToken, PRIVY_APP_ID } from "@/lib/privy.functions";
+import { SIGNED_OUT_KEY } from "@/lib/sign-out";
 
 const inputClass =
   "h-11 w-full rounded-xl border border-border/60 bg-surface/75 py-2.5 pl-10 pr-3.5 text-sm outline-none transition placeholder:text-muted-foreground/75 focus:border-primary focus:ring-2 focus:ring-primary/25";
@@ -24,6 +25,11 @@ function Inner() {
 
   useEffect(() => {
     if (!ready || !authenticated || done.current) return;
+    if (window.localStorage.getItem(SIGNED_OUT_KEY)) {
+      window.localStorage.removeItem(SIGNED_OUT_KEY);
+      void logout();
+      return;
+    }
     done.current = true;
     setBusy(true);
     void (async () => {
@@ -47,6 +53,7 @@ function Inner() {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    window.localStorage.removeItem(SIGNED_OUT_KEY);
     setBusy(true);
     try {
       if (step === "email") {
@@ -64,6 +71,7 @@ function Inner() {
 
   async function onGoogle() {
     setError(null);
+    window.localStorage.removeItem(SIGNED_OUT_KEY);
     try { await initOAuth({ provider: "google" }); }
     catch (err) { setError(err instanceof Error ? err.message : "Google sign-in failed."); }
   }
