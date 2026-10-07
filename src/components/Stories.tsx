@@ -179,7 +179,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
 
       {cur && open && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="relative flex h-full w-full max-w-[480px] items-center justify-center overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
+          <div className="relative flex h-[100dvh] w-full max-w-[480px] items-center justify-center overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
             {cur.media_type === "video"
               ? <video key={cur.id} src={cur.media_url} autoPlay playsInline muted={!!cur.music_url} onEnded={next} className="h-full w-full object-cover" />
               : <img key={cur.id} src={cur.media_url} alt="Story" className="h-full w-full object-cover" />}
@@ -208,7 +208,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
           </div>
           <button aria-label="Next" onClick={next} className="absolute inset-y-20 right-0 z-[5] w-1/3" />
           <button aria-label="Previous" onClick={() => setOpen(open.i > 0 ? { g: open.g, i: open.i - 1 } : open.g > 0 ? { g: open.g - 1, i: 0 } : open)} className="absolute inset-y-20 left-0 z-[5] w-1/3" />
-          <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-[480px] p-3 text-white">
+          <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-[480px] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] text-white">
             {sent && <p className="mb-2 text-center text-xs opacity-80">{sent}</p>}
             {cur.author_id === userId ? (
               <button onClick={() => void loadViewers()} className="mx-auto flex items-center gap-2 rounded-full bg-background/20 px-4 py-2 text-sm"><Eye className="size-4" />See who viewed</button>
