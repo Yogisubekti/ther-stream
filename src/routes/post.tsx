@@ -10,9 +10,9 @@ export const Route = createFileRoute("/post")({
   validateSearch: z.object({ id: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: "Postingan — Mindcaster" },
+      { title: "Post — Mindcaster" },
       { name: "description", content: "View a post shared on Mindcaster." },
-      { property: "og:title", content: "Postingan — Mindcaster" },
+      { property: "og:title", content: "Post — Mindcaster" },
       { property: "og:description", content: "A post shared on Mindcaster — Where Ideas Become Onchain." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/post")({
 
 function PostRoute() {
   const { id } = Route.useSearch();
-  return <AppShell title="Postingan">{(u) => <PostView userId={u.id} id={id} />}</AppShell>;
+  return <AppShell title="Post">{(u) => <PostView userId={u.id} id={id} />}</AppShell>;
 }
 
 function PostView({ userId, id }: { userId: string; id: string | undefined }) {
