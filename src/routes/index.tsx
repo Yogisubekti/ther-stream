@@ -37,7 +37,7 @@ function HomeRoute() {
   const [view, setView] = useState<HomeView>("home");
   const title = view === "bookmarks" ? t("bookmarks") : view === "groups" ? t("groups") : "Home";
   const languageOptions: { value: LanguagePreference; label: string }[] = [
-    { value: "auto", label: t("automatic") }, { value: "id", label: t("indonesian") }, { value: "en", label: t("english") },
+    { value: "id", label: t("indonesian") }, { value: "en", label: t("english") },
   ];
   const actions = (
     <DropdownMenu>
