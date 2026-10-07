@@ -19,9 +19,9 @@ export const Route = createFileRoute("/profile")({
   validateSearch: z.object({ id: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: "Profil — Mindcaster" },
+      { title: "Profile — Mindcaster" },
       { name: "description", content: "Mindcaster profile: bio, username, photo, posts, and reminds." },
-      { property: "og:title", content: "Profil — Mindcaster" },
+      { property: "og:title", content: "Profile — Mindcaster" },
       { property: "og:description", content: "View profiles, posts, and reposts on Mindcaster." },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary" },
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/profile")({
 
 function ProfileRoute() {
   const { id } = Route.useSearch();
-  return <AppShell title="Profil">{(u) => <ProfileView key={id ?? u.id} user={u} profileId={id ?? u.id} />}</AppShell>;
+  return <AppShell title="Profile">{(u) => <ProfileView key={id ?? u.id} user={u} profileId={id ?? u.id} />}</AppShell>;
 }
 
 function ProfileView({ user, profileId }: { user: User; profileId: string }) {
@@ -126,7 +126,7 @@ function EditProfile({ profile, onDone }: { profile: Profile; onDone: () => void
     e.preventDefault();
     setError(null);
     const u = username.trim();
-    if (u && !/^[a-zA-Z0-9_]{3,20}$/.test(u)) return setError("Username 3–20 karakter: huruf, angka, atau _.");
+    if (u && !/^[a-zA-Z0-9_]{3,20}$/.test(u)) return setError("Username must be 3–20 characters: letters, numbers, or _.");
     setSaving(true);
     const { error } = await supabase.from("profiles").update({ display_name: name.trim() || null, username: u || null, bio: bio.trim() || null, avatar_url: avatar }).eq("id", profile.id);
     setSaving(false);
@@ -146,7 +146,7 @@ function EditProfile({ profile, onDone }: { profile: Profile; onDone: () => void
       <div className="flex items-center gap-3">
         <Avatar profile={{ ...profile, avatar_url: avatar }} size={56} />
         <label className="flex cursor-pointer items-center gap-2 rounded-full border border-border/60 bg-surface/70 px-3 py-1.5 text-xs font-semibold">
-          <Camera className="size-4" />Ganti foto
+          <Camera className="size-4" />Change photo
           <input type="file" accept="image/*" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
         </label>
         {avatar && <button type="button" onClick={() => setAvatar(null)} className="text-xs text-muted-foreground underline">Remove</button>}
