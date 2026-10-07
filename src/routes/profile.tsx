@@ -12,6 +12,7 @@ import { PostCard } from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
 import { uploadImage } from "@/lib/upload";
 import { signOutEverywhere } from "@/lib/sign-out";
+import { usePreferences } from "@/lib/preferences";
 import { supabase } from "@/integrations/supabase/client";
 import { profileLink, shareLink } from "@/lib/share";
 import { displayName, fetchPosts, handle, joined, resizeImage, short, type Post, type Profile } from "@/lib/social";
@@ -51,6 +52,7 @@ function ProfileRoute() {
 
 function ProfileView({ user, profileId }: { user: User; profileId: string }) {
   const isMe = profileId === user.id;
+  const { t } = usePreferences();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [tab, setTab] = useState<"posts" | "reposts">("posts");
   const [posts, setPosts] = useState<Post[]>([]);
@@ -90,8 +92,8 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
             <div className="flex gap-2">
               {isMe ? (
                 <>
-                  <Button variant="surface" size="sm" onClick={() => setEditing((v) => !v)}><Pencil className="size-4" />Edit profil</Button>
-                  <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => void (async () => { await signOutEverywhere(); window.location.replace("/"); })()}><LogOut className="size-4" /></Button>
+                  <Button variant="surface" size="sm" onClick={() => setEditing((v) => !v)}><Pencil className="size-4" />{t("editProfile")}</Button>
+                  <Button variant="ghost" size="icon" aria-label={t("signOut")} onClick={() => void (async () => { await signOutEverywhere(); window.location.replace("/"); })()}><LogOut className="size-4" /></Button>
                 </>
               ) : (
                 <>
@@ -99,11 +101,11 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
                   <Button asChild variant="surface" size="sm"><Link to="/messages" search={{ with: profile.id }}><Mail className="size-4" />Message</Link></Button>
                 </>
               )}
-              <Button variant="ghost" size="icon" aria-label="Share profil" onClick={() => void shareLink(profileLink(profile.id), displayName(profile))}><Share2 className="size-4" /></Button>
+              <Button variant="ghost" size="icon" aria-label={t("shareProfile")} onClick={() => void shareLink(profileLink(profile.id), displayName(profile))}><Share2 className="size-4" /></Button>
             </div>
           </div>
           <h2 className="mt-3 flex items-center gap-1.5 font-display text-xl font-semibold">{displayName(profile)}<IdentityBadges username={profile.username} /></h2>
-          {handle(profile) ? <p className="text-sm text-muted-foreground">{handle(profile)}</p> : isMe && <p className="text-sm text-muted-foreground">No username yet</p>}
+          {handle(profile) ? <p className="text-sm text-muted-foreground">{handle(profile)}</p> : isMe && <p className="text-sm text-muted-foreground">{t("noUsername")}</p>}
           {profile.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
             <span className="flex items-center gap-1"><CalendarDays className="size-3.5" />Joined {joined(profile.created_at)}</span>
@@ -117,8 +119,8 @@ function ProfileView({ user, profileId }: { user: User; profileId: string }) {
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 
       <div className="glass-panel grid grid-cols-2 rounded-full border border-surface/80 p-1">
-        {(["posts", "reposts"] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={`rounded-full py-2 text-sm font-semibold transition ${tab === t ? "bg-surface shadow-tab" : "text-muted-foreground"}`}>{t === "posts" ? "Postingan" : "Remind"}</button>
+        {(["posts", "reposts"] as const).map((key) => (
+          <button key={key} onClick={() => setTab(key)} className={`rounded-full py-2 text-sm font-semibold transition ${tab === key ? "bg-surface shadow-tab" : "text-muted-foreground"}`}>{key === "posts" ? t("posts") : t("repost")}</button>
         ))}
       </div>
       {posts.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No {tab === "posts" ? "posts" : "reminds"} yet.</p>}
@@ -134,6 +136,7 @@ function EditProfile({ profile, onDone }: { profile: Profile; onDone: () => void
   const [avatar, setAvatar] = useState(profile.avatar_url);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = usePreferences();
 
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -159,16 +162,16 @@ function EditProfile({ profile, onDone }: { profile: Profile; onDone: () => void
       <div className="flex items-center gap-3">
         <Avatar profile={{ ...profile, avatar_url: avatar }} size={56} />
         <label className="flex cursor-pointer items-center gap-2 rounded-full border border-border/60 bg-surface/70 px-3 py-1.5 text-xs font-semibold">
-          <Camera className="size-4" />Change photo
+          <Camera className="size-4" />{t("changePhoto")}
           <input type="file" accept="image/*" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
         </label>
-        {avatar && <button type="button" onClick={() => setAvatar(null)} className="text-xs text-muted-foreground underline">Remove</button>}
+        {avatar && <button type="button" onClick={() => setAvatar(null)} className="text-xs text-muted-foreground underline">{t("remove")}</button>}
       </div>
-      <label className="block"><span className="mb-1 block text-xs font-semibold text-foreground/70">Nama</span><input value={name} onChange={(e) => setName(e.target.value)} maxLength={50} className={field} /></label>
+      <label className="block"><span className="mb-1 block text-xs font-semibold text-foreground/70">{t("name")}</span><input value={name} onChange={(e) => setName(e.target.value)} maxLength={50} className={field} /></label>
       <label className="block"><span className="mb-1 block text-xs font-semibold text-foreground/70">Username</span>
         <span className="relative block"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">@</span><input value={username} onChange={(e) => setUsername(e.target.value)} maxLength={20} placeholder="username" className={`${field} pl-7`} /></span>
       </label>
-      <label className="block"><span className="mb-1 block text-xs font-semibold text-foreground/70">Bio</span><textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={160} rows={3} className={`${field} h-auto resize-none py-2`} /><span className="text-xs text-muted-foreground">{bio.length}/160</span></label>
+      <label className="block"><span className="mb-1 block text-xs font-semibold text-foreground/70">{t("bio")}</span><textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={160} rows={3} className={`${field} h-auto resize-none py-2`} /><span className="text-xs text-muted-foreground">{bio.length}/160</span></label>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       <div className="flex justify-end gap-2">
         <Button type="button" variant="ghost" size="sm" onClick={onDone}>Cancel</Button>
