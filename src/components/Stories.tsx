@@ -74,7 +74,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
     const { error } = await supabase.from("story_views" as never).upsert({ story_id: cur.id, viewer_id: userId, reaction: emoji } as never, { onConflict: "story_id,viewer_id" });
     if (error) return onError(error.message);
     await supabase.from("direct_messages").insert({ sender_id: userId, recipient_id: cur.author_id, content: `${emoji} replied to your story` });
-    setSent("Reaksi terkirim");
+    setSent("Reaction sent");
   }
 
   async function sendMsg() {
