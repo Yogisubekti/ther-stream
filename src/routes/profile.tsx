@@ -17,7 +17,7 @@ import { profileLink, shareLink } from "@/lib/share";
 import { displayName, fetchPosts, handle, joined, resizeImage, short, type Post, type Profile } from "@/lib/social";
 
 export const Route = createFileRoute("/profile")({
-  validateSearch: z.object({ id: z.string().uuid().optional() }),
+  validateSearch: z.object({ id: z.string().uuid().optional(), u: z.string().max(40).optional() }),
   head: () => ({
     meta: [
       { title: "Profile — Mindcaster" },
@@ -33,8 +33,20 @@ export const Route = createFileRoute("/profile")({
 
 
 function ProfileRoute() {
-  const { id } = Route.useSearch();
-  return <AppShell title="Profile">{(u) => <ProfileView key={id ?? u.id} user={u} profileId={id ?? u.id} />}</AppShell>;
+  const { id, u: username } = Route.useSearch();
+  const [resolved, setResolved] = useState<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (!username || id) return;
+    void supabase.from("profiles").select("id").ilike("username", username.replace(/[%_]/g, "\\$&")).maybeSingle().then(({ data }) => setResolved(data?.id ?? null));
+  }, [username, id]);
+  return <AppShell title="Profile">{(u) => {
+    if (username && !id) {
+      if (resolved === undefined) return <p className="py-10 text-center text-sm text-muted-foreground">Loading profile…</p>;
+      if (resolved === null) return <p className="py-10 text-center text-sm text-muted-foreground">User @{username} not found.</p>;
+      return <ProfileView key={resolved} user={u} profileId={resolved} />;
+    }
+    return <ProfileView key={id ?? u.id} user={u} profileId={id ?? u.id} />;
+  }}</AppShell>;
 }
 
 function ProfileView({ user, profileId }: { user: User; profileId: string }) {

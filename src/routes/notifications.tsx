@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Heart, Mail, MessageCircle, Repeat2, SmilePlus } from "lucide-react";
+import { AtSign, Heart, Mail, MessageCircle, Repeat2, SmilePlus } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
@@ -29,6 +29,7 @@ const META: Record<string, { icon: typeof Heart; text: string }> = {
   reaction: { icon: SmilePlus, text: "memberi reaksi" },
   comment: { icon: MessageCircle, text: "mengomentari:" },
   message: { icon: Mail, text: "sent a message:" },
+  mention: { icon: AtSign, text: "mentioned you:" },
 };
 
 function Notifications() {
