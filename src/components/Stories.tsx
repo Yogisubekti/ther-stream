@@ -3,7 +3,8 @@ import { Eye, Plus, Send, Trash2, X } from "lucide-react";
 
 import { Avatar } from "@/components/Avatar";
 import { supabase } from "@/integrations/supabase/client";
-import { uploadImage, uploadAudio } from "@/lib/upload";
+import { uploadImage } from "@/lib/upload";
+import { searchMusic, type Track } from "@/lib/music.functions";
 import { displayName, timeAgo, type Author } from "@/lib/social";
 
 type Story = { id: string; author_id: string; media_url: string; media_type: "image" | "video"; music_url: string | null; music_title: string | null; created_at: string; author: Author };
@@ -29,7 +30,16 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
   }, [userId, onError]);
   useEffect(() => { void load(); }, [load]);
 
-  const [draft, setDraft] = useState<{ file: File; preview: string; music: File | null; musicUrl?: string } | null>(null);
+  const [draft, setDraft] = useState<{ file: File; preview: string; music: Track | null } | null>(null);
+  const [mq, setMq] = useState("");
+  const [results, setResults] = useState<Track[] | null>(null);
+  const [searching, setSearching] = useState(false);
+  async function findMusic() {
+    if (!mq.trim()) return;
+    setSearching(true);
+    try { setResults(await searchMusic({ data: { q: mq } })); } catch (e) { onError((e as Error).message); } finally { setSearching(false); }
+  }
+  const _unused = useState<null>(null);
   const [muted, setMuted] = useState(false);
   async function add() {
     if (!draft) return;
@@ -37,11 +47,11 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
     setBusy(true);
     try {
       const media_url = await uploadImage(file, "story");
-      const music_url = music ? await uploadAudio(music) : null;
-      const music_title = music ? music.name.replace(/\.[^.]+$/, "").slice(0, 120) : null;
+      const music_url = music?.preview ?? null;
+      const music_title = music ? `${music.title} · ${music.artist}`.slice(0, 120) : null;
       const { error } = await supabase.from("stories" as never).insert({ author_id: userId, media_url, media_type: file.type.startsWith("video/") ? "video" : "image", music_url, music_title } as never);
       if (error) throw error;
-      URL.revokeObjectURL(draft.preview); setDraft(null);
+      URL.revokeObjectURL(draft.preview); setDraft(null); setResults(null); setMq("");
       await load();
     } catch (e) { onError((e as Error).message); } finally { setBusy(false); }
   }
@@ -127,17 +137,39 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
             {draft.file.type.startsWith("video/")
               ? <video src={draft.preview} autoPlay loop muted={!!draft.music} playsInline className="h-full w-full object-cover" />
               : <img src={draft.preview} alt="Story preview" className="h-full w-full object-cover" />}
-            {draft.music && <audio key={draft.music.name} src={draft.musicUrl} autoPlay loop />}
+            {draft.music && <audio key={draft.music.id} src={draft.music.preview} autoPlay loop />}
             <div className="absolute inset-x-0 top-0 flex justify-between bg-gradient-to-b from-black/70 to-transparent p-3 text-white">
               <button type="button" onClick={() => { URL.revokeObjectURL(draft.preview); setDraft(null); }} className="rounded-full bg-black/40 px-3 py-1.5 text-sm">Cancel</button>
             </div>
             <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 bg-gradient-to-t from-black/80 to-transparent p-4 text-white">
-              <label className="flex cursor-pointer items-center gap-2 rounded-full bg-white/15 px-4 py-2.5 text-sm backdrop-blur">
-                <span aria-hidden>🎵</span>
-                <span className="min-w-0 flex-1 truncate">{draft.music ? draft.music.name : "Add music (MP3, M4A…)"}</span>
-                {draft.music && <button type="button" onClick={(e) => { e.preventDefault(); setDraft({ ...draft, music: null }); }} className="text-xs underline">Remove</button>}
-                <input type="file" accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg,.mp3,.m4a" className="sr-only" onChange={(e) => { const m = e.target.files?.[0]; e.target.value = ""; if (m) setDraft({ ...draft, music: m, musicUrl: URL.createObjectURL(m) }); }} />
-              </label>
+              {draft.music ? (
+                <div className="flex items-center gap-2 rounded-full bg-white/15 py-1.5 pl-1.5 pr-4 text-sm backdrop-blur">
+                  <img src={draft.music.artwork} alt="" className="size-8 rounded-full" />
+                  <span className="min-w-0 flex-1 truncate">🎵 {draft.music.title} · {draft.music.artist}</span>
+                  <button type="button" onClick={() => setDraft({ ...draft, music: null })} className="text-xs underline">Change</button>
+                </div>
+              ) : (
+                <>
+                  {results && (
+                    <ul className="max-h-60 overflow-y-auto rounded-2xl bg-black/60 p-1 backdrop-blur">
+                      {results.length === 0 && <li className="p-3 text-sm text-white/70">No songs found.</li>}
+                      {results.map((t) => (
+                        <li key={t.id}>
+                          <button type="button" onClick={() => { setDraft({ ...draft, music: t }); setResults(null); }} className="flex w-full items-center gap-2 rounded-xl p-2 text-left hover:bg-white/10">
+                            <img src={t.artwork} alt="" className="size-10 rounded-md" />
+                            <span className="min-w-0"><span className="block truncate text-sm font-medium">{t.title}</span><span className="block truncate text-xs text-white/70">{t.artist}</span></span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <form onSubmit={(e) => { e.preventDefault(); void findMusic(); }} className="flex items-center gap-2 rounded-full bg-white/15 py-1.5 pl-4 pr-1.5 text-sm backdrop-blur">
+                    <span aria-hidden>🎵</span>
+                    <input value={mq} onChange={(e) => setMq(e.target.value)} placeholder="Search music (song or artist)" aria-label="Search music" className="min-w-0 flex-1 bg-transparent placeholder:text-white/60 focus:outline-none" />
+                    <button type="submit" disabled={searching} className="rounded-full bg-white/20 px-3 py-1 text-xs">{searching ? "…" : "Search"}</button>
+                  </form>
+                </>
+              )}
               <button type="button" disabled={busy} onClick={() => void add()} className="rounded-full bg-primary py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy ? "Uploading…" : "Share to story"}</button>
             </div>
           </div>
@@ -196,7 +228,7 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
           {viewers && (
             <div className="absolute inset-x-0 bottom-0 z-20 mx-auto max-h-[60%] max-w-[600px] overflow-y-auto rounded-t-3xl bg-background p-4 text-foreground">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-semibold">Dilihat oleh {viewers.length}</h3>
+                <h3 className="font-semibold">Viewed by {viewers.length}</h3>
                 <button aria-label="Tutup daftar" onClick={() => setViewers(null)}><X className="size-5" /></button>
               </div>
               {viewers.length === 0 && <p className="text-sm text-muted-foreground">No viewers yet.</p>}
