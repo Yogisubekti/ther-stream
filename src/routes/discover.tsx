@@ -51,11 +51,11 @@ function Discover({ user }: { user: User }) {
 
   return (
     <>
-      <DiscoverBanners />
       <label className="relative block">
         <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or @username" className="glass-panel h-11 w-full rounded-full border border-surface/80 pl-10 pr-4 text-sm outline-none focus:border-primary" />
       </label>
+      <DiscoverBanners />
       <section className="glass-panel rounded-[24px] border border-surface/80 p-4">
         <h2 className="mb-3 font-display text-sm font-semibold">{q ? "Search results" : "New users"}</h2>
         {people.length === 0 && <p className="text-sm text-muted-foreground">No users found.</p>}
