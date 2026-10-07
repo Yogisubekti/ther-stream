@@ -34,6 +34,12 @@ export function AppShell({ title, actions, children }: { title: string; actions?
     return () => data.subscription.unsubscribe();
   }, []);
 
+  // Signed out anywhere: always land back on the clean entry URL so the login screen never runs on /profile, /post, etc.
+  useEffect(() => {
+    if (!ready || user) return;
+    if (window.location.pathname !== "/") window.location.replace("/");
+  }, [ready, user]);
+
   useEffect(() => {
     if (!user) return;
     void supabase.from("notifications").select("id", { count: "exact", head: true }).eq("read", false).then(({ count }) => setUnread(count ?? 0));
