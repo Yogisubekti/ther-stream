@@ -192,8 +192,11 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black">
           <div className="relative flex h-[100dvh] w-full max-w-[480px] items-center justify-center overflow-hidden sm:my-4 sm:h-[calc(100%-2rem)] sm:rounded-2xl">
             {cur.media_type === "video"
-              ? <video key={cur.id} src={cur.media_url} autoPlay playsInline muted={!!cur.music_url} onEnded={next} className="h-full w-full object-cover" />
-              : <img key={cur.id} src={cur.media_url} alt="Story" className="h-full w-full object-cover" />}
+              ? <video key={`bg-${cur.id}`} src={cur.media_url} aria-hidden muted playsInline className="absolute inset-0 h-full w-full scale-125 object-cover opacity-60 blur-2xl" />
+              : <img key={`bg-${cur.id}`} src={cur.media_url} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-125 object-cover opacity-60 blur-2xl" />}
+            {cur.media_type === "video"
+              ? <video key={cur.id} src={cur.media_url} autoPlay playsInline muted={!!cur.music_url} onEnded={next} className="relative z-[1] max-h-full max-w-full object-contain" />
+              : <img key={cur.id} src={cur.media_url} alt="Story" className="relative z-[1] max-h-full max-w-full object-contain" />}
             {cur.music_url && <audio key={`m-${cur.id}`} src={cur.music_url} autoPlay loop muted={muted} />}
             {cur.music_url && (
               <button type="button" onClick={() => setMuted((m) => !m)} aria-label={muted ? "Unmute music" : "Mute music"} className="absolute left-3 top-20 z-20 flex max-w-[75%] items-center gap-1.5 rounded-full bg-black/45 px-3 py-1 text-xs text-white backdrop-blur">
