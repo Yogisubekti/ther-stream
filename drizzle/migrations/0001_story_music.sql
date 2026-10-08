@@ -1,1 +1,0 @@
-ALTER TABLE public.stories ADD COLUMN IF NOT EXISTS music_url text, ADD COLUMN IF NOT EXISTS music_title text CHECK (music_title IS NULL OR length(music_title) <= 120);
