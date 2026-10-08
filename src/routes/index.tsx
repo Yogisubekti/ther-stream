@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Fragment, useCallback, useEffect, useState, type FormEvent } from "react";
-import { ADS, AD_EVERY, SponsoredPost } from "@/components/SponsoredPost";
+import { SponsoredPost } from "@/components/SponsoredPost";
+import { ADS, AD_EVERY } from "@/lib/ads";
 import { BadgeCheck, Bell, Bookmark, Check, CircleHelp, Languages, Loader2, Menu, ImagePlus, Send, Users, UserRoundPlus, Wand2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { generatePostDraft } from "@/lib/ai-draft.functions";
