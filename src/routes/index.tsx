@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { Fragment, useCallback, useEffect, useState, type FormEvent } from "react";
+import { ADS, AD_EVERY, SponsoredPost } from "@/components/SponsoredPost";
 import { BadgeCheck, Bell, Bookmark, Check, CircleHelp, Languages, Loader2, Menu, ImagePlus, Send, Users, UserRoundPlus, Wand2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { generatePostDraft } from "@/lib/ai-draft.functions";
@@ -136,7 +137,13 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
       </form>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
        {posts.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">{t("noPosts")}</p>}
-      {posts.map((p) => <PostCard key={p.id} post={p} userId={user.id} onChange={load} onError={setError} />)}
+      {posts.map((p, i) => (
+        <Fragment key={p.id}>
+          <PostCard post={p} userId={user.id} onChange={load} onError={setError} />
+          {(i + 1) % AD_EVERY === 0 && <SponsoredPost ad={ADS[((i + 1) / AD_EVERY - 1) % ADS.length]} />}
+        </Fragment>
+      ))}
+      {posts.length > 0 && posts.length < AD_EVERY && <SponsoredPost ad={ADS[0]} />}
       </>}
     </>
   );
