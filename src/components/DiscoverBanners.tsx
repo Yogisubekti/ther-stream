@@ -3,17 +3,23 @@ import { X } from "lucide-react";
 
 import bannerOgNft from "@/assets/banner-og-nft.png.asset.json";
 import bannerEnterMind from "@/assets/banner-enter-mind.png.asset.json";
+import bannerMind from "@/assets/banner-buy-mind-pons.png.asset.json";
 
-const BANNERS = [
-  { src: bannerOgNft.url, alt: "Mindcaster — Get OG NFT", clickable: true },
-  { src: bannerEnterMind.url, alt: "Mindcaster — Enter the Mind. Discover. Connect. Cast.", clickable: false },
+type Soon = { emoji: string; title: string; text: string };
+// Set `href` on the $MIND banner once the PONS link is ready.
+const BANNERS: { src: string; alt: string; href?: string; soon?: Soon }[] = [
+  { src: bannerMind.url, alt: "Buy $MIND on PONS", soon: { emoji: "🚀", title: "Soon", text: "$MIND is launching on PONS. The buy link opens here soon — stay tuned!" } },
+  { src: bannerOgNft.url, alt: "Mindcaster — Get OG NFT", soon: { emoji: "👑", title: "Coming Soon", text: "Mindcaster OG NFT isn't open yet. Stay tuned — the first OGs will get special perks." } },
+  { src: bannerEnterMind.url, alt: "Mindcaster — Enter the Mind. Discover. Connect. Cast." },
 ];
 
 const ROTATE_MS = 5000;
 
 export function DiscoverBanners() {
   const [index, setIndex] = useState(0);
-  const [showSoon, setShowSoon] = useState(false);
+  const [soon, setSoon] = useState<Soon | null>(null);
+  const showSoon = !!soon;
+  const setShowSoon = (v: boolean) => { if (!v) setSoon(null); };
 
   // Pause auto-rotation while the "soon" popup is open.
   useEffect(() => {
@@ -34,12 +40,15 @@ export function DiscoverBanners() {
               loading={i === 0 ? "eager" : "lazy"}
             />
           );
-          return b.clickable ? (
+          if (b.href) return (
+            <a key={b.src} href={b.href} target="_blank" rel="noreferrer" aria-label={b.alt} className={`block w-full ${i === index ? "" : "absolute inset-0"}`}>{img}</a>
+          );
+          return b.soon ? (
             <button
               key={b.src}
               type="button"
               aria-label={b.alt}
-              onClick={() => setShowSoon(true)}
+              onClick={() => setSoon(b.soon!)}
               className={`block w-full text-left ${i === index ? "" : "absolute inset-0"}`}
             >
               {img}
@@ -83,11 +92,9 @@ export function DiscoverBanners() {
             >
               <X className="size-4" />
             </button>
-            <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-primary/15 text-2xl">👑</div>
-            <h3 className="font-display text-lg font-bold">Coming Soon</h3>
-            <p className="mt-1.5 text-sm text-muted-foreground">
-              Mindcaster OG NFT isn't open yet. Stay tuned — the first OGs will get special perks.
-            </p>
+            <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-primary/15 text-2xl">{soon!.emoji}</div>
+            <h3 className="font-display text-lg font-bold">{soon!.title}</h3>
+            <p className="mt-1.5 text-sm text-muted-foreground">{soon!.text}</p>
             <button
               type="button"
               onClick={() => setShowSoon(false)}

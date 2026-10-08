@@ -1,4 +1,4 @@
-export const PAY_TO = "0xab6bc966Cb63DA3a1FE0303a736D548E1D9d8591" as const;
+export const PAY_TO = "0x676AA6aFb7cbf095b69BD25AB34A931AB4bC305e" as const;
 export const PROMO_LIMIT = 1000;
 
 export const PLANS = {
