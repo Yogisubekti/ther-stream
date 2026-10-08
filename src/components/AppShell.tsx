@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bell, Compass, Home, Mail } from "lucide-react";
+import { Compass, Home, Mail, Wallet } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import signalBackground from "@/assets/ponscaster-signal-bg.jpg";
@@ -16,7 +16,7 @@ import type { Profile } from "@/lib/social";
 const NAV = [
   { to: "/", label: "Home", icon: Home },
   { to: "/discover", label: "Discover", icon: Compass },
-  { to: "/notifications", label: "Notifications", icon: Bell },
+  { to: "/wallet", label: "Wallet", icon: Wallet },
   { to: "/messages", label: "Messages", icon: Mail },
   { to: "/fomo", label: "Fomo" },
 ] as const;
@@ -81,7 +81,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                 <Avatar profile={profile} size={34} />
               </Link>
               {title === "Home" ? <BrandLogo size={34} className="pointer-events-none absolute left-1/2 -translate-x-1/2" /> : <h1 className="absolute left-1/2 max-w-[55%] -translate-x-1/2 truncate font-display text-base font-semibold">{title === "Discover" ? t("discover") : title === "Notifikasi" ? t("notifications") : title === "Pesan" ? t("messages") : title === "Profil" ? t("profile") : title}</h1>}
-              <div className="ml-auto">{actions}</div>
+              <div className="relative ml-auto">{actions}{actions && unread > 0 && <span aria-label="Ada notifikasi baru" className="pointer-events-none absolute right-1 top-1 size-2.5 rounded-full bg-destructive ring-2 ring-background" />}</div>
             </div>
           </header>
           <main className="relative z-10 mx-auto w-full max-w-[600px] space-y-3 px-3 pb-28 pt-4 sm:px-4">{children(user)}</main>
@@ -89,7 +89,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
             <ul className="mx-auto grid h-16 max-w-[600px] grid-cols-5">
               {NAV.map(({ to, label, ...rest }) => {
                 const Icon = "icon" in rest ? rest.icon : null;
-                const translatedLabel = label === "Home" ? t("home") : label === "Discover" ? t("discover") : label === "Notifications" ? t("notifications") : label === "Messages" ? t("messages") : label;
+                const translatedLabel = label === "Home" ? t("home") : label === "Discover" ? t("discover") : label === "Messages" ? t("messages") : label;
                 return (
                   <li key={to}>
                     <Link to={to} activeOptions={{ exact: true, includeSearch: false }} aria-label={translatedLabel} title={translatedLabel} className="group flex h-full items-center justify-center text-muted-foreground data-[status=active]:text-foreground">
@@ -99,7 +99,6 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                         ) : (
                           <img src={fomoLogo.url} alt="" width={816} height={816} className="size-[24px] rounded-md object-contain" />
                         )}
-                        {to === "/notifications" && unread > 0 && <span className="absolute right-1.5 top-0.5 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">{unread > 9 ? "9+" : unread}</span>}
                       </span>
                     </Link>
                   </li>
