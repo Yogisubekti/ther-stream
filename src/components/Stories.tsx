@@ -35,11 +35,19 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
   const [mq, setMq] = useState("");
   const [results, setResults] = useState<Track[] | null>(null);
   const [searching, setSearching] = useState(false);
-  async function findMusic() {
-    if (!mq.trim()) return;
-    setSearching(true);
-    try { setResults(await searchMusic({ data: { q: mq } })); } catch (e) { onError((e as Error).message); } finally { setSearching(false); }
-  }
+  const [searchErr, setSearchErr] = useState("");
+  const findMusic = useCallback(async (term: string) => {
+    if (!term.trim()) return;
+    setSearching(true); setSearchErr("");
+    try { setResults(await searchMusic(term.trim())); }
+    catch { setSearchErr("Couldn't reach music search. Check your connection and try again."); }
+    finally { setSearching(false); }
+  }, []);
+  useEffect(() => {
+    if (!draft || draft.music) return;
+    const t = setTimeout(() => void findMusic(mq.trim() || "top hits 2026"), mq ? 450 : 0);
+    return () => clearTimeout(t);
+  }, [mq, !!draft, draft?.music, findMusic]); // eslint-disable-line react-hooks/exhaustive-deps
   const [muted, setMuted] = useState(false);
   async function add() {
     if (!draft) return;
