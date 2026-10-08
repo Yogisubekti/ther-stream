@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, useHydrated } from "@tanstack/react-router";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { BadgeCheck, Loader2 } from "lucide-react";
 import { encodeFunctionData, erc20Abi } from "viem";
@@ -8,10 +8,12 @@ import { toast } from "sonner";
 import ogBadge from "@/assets/og-badge.jpg.asset.json";
 import { AppShell } from "@/components/AppShell";
 import { refreshBadges } from "@/components/IdentityBadges";
+import type { Eth } from "@/components/PrivyWalletPay";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { CHAINS, PAY_TO, PLANS, type ChainId, type PlanId, type TokenId } from "@/lib/verification";
 import { confirmVerificationPayment, getPromoSlots } from "@/lib/verification.functions";
+import { syncPrivyWallet } from "@/lib/privy-wallet.functions";
 
 export const Route = createFileRoute("/verify")({
   head: () => ({
@@ -33,11 +35,13 @@ const PLAN_INFO: Record<PlanId, { title: string; price: string; note: string }> 
   yearly: { title: "Yearly", price: "$30 / year", note: "Blue check + OG badge + upcoming benefits" },
 };
 
-type Eth = { request: (a: { method: string; params?: unknown[] }) => Promise<unknown> };
+const PrivyWalletPay = lazy(() => import("@/components/PrivyWalletPay"));
 
 function VerifyPage({ userId }: { userId: string }) {
   const slotsFn = useServerFn(getPromoSlots);
   const confirmFn = useServerFn(confirmVerificationPayment);
+  const syncFn = useServerFn(syncPrivyWallet);
+  const hydrated = useHydrated();
   const [slots, setSlots] = useState<{ used: number; limit: number } | null>(null);
   const [badge, setBadge] = useState<{ verified_until: string; og: boolean; promo_used: boolean } | null>(null);
   const [wallet, setWallet] = useState<string | null>(null);
@@ -60,15 +64,25 @@ function VerifyPage({ userId }: { userId: string }) {
   const promoOff = !!badge?.promo_used || (slots ? slots.used >= slots.limit : false);
   useEffect(() => { if (promoOff && plan === "promo") setPlan("monthly"); }, [promoOff, plan]);
 
-  async function pay(): Promise<void> {
+  function payMetaMask() {
     const eth = (window as unknown as { ethereum?: Eth }).ethereum;
-    if (!eth) { toast.error("MetaMask not detected."); return; }
-    if (!wallet) { toast.error("Set up your wallet first."); return; }
+    if (!eth) { toast.error("MetaMask tidak terdeteksi."); return; }
+    if (!wallet) { toast.error("Hubungkan dompet Mindcaster dulu."); return; }
+    void (async () => {
+      const [from] = (await eth.request({ method: "eth_requestAccounts" })) as string[];
+      if (from?.toLowerCase() !== wallet.toLowerCase()) { toast.error("Gunakan dompet yang sama dengan profil Anda."); return; }
+      await pay(eth, from);
+    })();
+  }
+
+  async function pay(eth: Eth, from: string): Promise<void> {
     const c = CHAINS[chain]; const t = c.tokens[token];
     try {
       setStep("Menghubungkan dompet…");
-      const [from] = (await eth.request({ method: "eth_requestAccounts" })) as string[];
-      if (from?.toLowerCase() !== wallet.toLowerCase()) throw new Error("Use the same wallet linked to your profile.");
+      if (from.toLowerCase() !== wallet?.toLowerCase()) {
+        const r = await syncFn({ data: { address: from } });
+        setWallet(r.address);
+      }
       const hexId = "0x" + c.id.toString(16);
       try { await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hexId }] }); }
       catch { await eth.request({ method: "wallet_addEthereumChain", params: [{ chainId: hexId, chainName: c.name, rpcUrls: [c.rpc], blockExplorerUrls: [c.explorer], nativeCurrency: { name: chain === "bnb" ? "BNB" : chain === "polygon" ? "POL" : "ETH", symbol: chain === "bnb" ? "BNB" : chain === "polygon" ? "POL" : "ETH", decimals: 18 } }] }); }
@@ -121,10 +135,12 @@ function VerifyPage({ userId }: { userId: string }) {
           <p className="mb-1.5 text-xs font-semibold text-muted-foreground">Koin</p>
           <div className="flex gap-2">{(["USDC", "USDT"] as TokenId[]).map((t) => <Button key={t} size="sm" variant={token === t ? "default" : "surface"} onClick={() => setToken(t)}>{t}</Button>)}</div>
         </div>
-        {!wallet && <p className="text-sm text-destructive">Set up your wallet on your <Link to="/profile" search={{}} className="underline">profile</Link> before paying.</p>}
-        <Button className="w-full" disabled={!!step || !wallet} onClick={pay}>
-          {step ? <><Loader2 className="size-4 animate-spin" />{step}</> : `Pay $${PLANS[plan].usd} ${token} on ${CHAINS[chain].name}`}
-        </Button>
+        {hydrated && (
+          <Suspense fallback={<Button className="w-full" disabled><Loader2 className="size-4 animate-spin" />Memuat dompet…</Button>}>
+            <PrivyWalletPay label={`Bayar $${PLANS[plan].usd} ${token} di ${CHAINS[chain].name}`} step={step} onPay={pay} />
+          </Suspense>
+        )}
+        <p className="text-center text-[11px] text-muted-foreground">Isi saldo {token} ke alamat dompet di atas dulu. Punya MetaMask? <button type="button" className="underline" onClick={payMetaMask}>Bayar pakai MetaMask</button></p>
         <p className="text-center text-[11px] text-muted-foreground">Make sure you have a little native coin for gas fees.</p>
       </section>
     </>
