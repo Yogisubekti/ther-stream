@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { BadgeCheck, Bookmark, Check, CircleHelp, Languages, Loader2, Menu, ImagePlus, Send, Users, UserRoundPlus, Wand2 } from "lucide-react";
+import { BadgeCheck, Bell, Bookmark, Check, CircleHelp, Languages, Loader2, Menu, ImagePlus, Send, Users, UserRoundPlus, Wand2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { generatePostDraft } from "@/lib/ai-draft.functions";
 import type { User } from "@supabase/supabase-js";
@@ -43,6 +43,8 @@ function HomeRoute() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-9" aria-label="Menu Home"><Menu className="size-5" /></Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuItem asChild><Link to="/notifications"><Bell />{t("notifications")}</Link></DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => setView("groups")}><Users />{t("groups")}</DropdownMenuItem>
         <DropdownMenuItem disabled><UserRoundPlus />{t("createGroup")} <span className="ml-auto text-[10px] font-semibold text-muted-foreground">{t("soon")}</span></DropdownMenuItem>
         <DropdownMenuItem asChild><Link to="/verify"><BadgeCheck />{t("verifyAccount")}</Link></DropdownMenuItem>
