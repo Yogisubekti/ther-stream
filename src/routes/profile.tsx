@@ -146,7 +146,7 @@ function EditProfile({ profile, onDone }: { profile: Profile; onDone: () => void
     setSaving(true);
     const { error } = await supabase.from("profiles").update({ display_name: name.trim() || null, username: u || null, bio: bio.trim() || null, avatar_url: avatar }).eq("id", profile.id);
     setSaving(false);
-    if (error) return setError(error.code === "23505" ? "Username is already taken." : error.message);
+    if (error) return setError(error.code === "23505" ? "Username is already taken." : /reserved/i.test(error.message) ? "This username is reserved. Please choose another one (4+ characters, not a brand name)." : error.message);
     onDone();
   }
 
