@@ -97,12 +97,21 @@ function Fomo() {
       {!loading && !error && rows.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No data yet.</p>}
       {tab === "leaderboard"
         ? rows.map((r, i) => {
-            const pnl = Number(pick(r, "pnl", "pnl_usd", "realized_pnl", "total_pnl", "stats.pnl"));
+            const pnlRaw = pick(r, "pnlUsd", "pnl", "pnl_usd", "realizedPnlUsd", "realized_pnl", "totalPnlUsd", "total_pnl", "stats.pnlUsd", "stats.pnl");
+            const pnl = Number(pnlRaw);
+            const vol = pick(r, "volumeUsd", "volume", "volume_usd", "stats.volumeUsd", "stats.volume");
+            const trades = str(pick(r, "trades", "tradeCount", "trade_count", "numTrades", "num_trades", "stats.trades"));
+            const tt = pick(r, "topTokens", "top_tokens", "tokens");
+            const tokens = (Array.isArray(tt) ? tt : []).map((t) => (typeof t === "string" ? t : str(pick(t as Row, "symbol", "token.symbol", "name")))).filter(Boolean).slice(0, 4);
             return (
               <article key={i} className="glass-panel flex items-center gap-3 rounded-2xl border border-surface/80 p-3">
                 <span className="w-7 text-center font-display text-sm font-bold text-primary">#{str(pick(r, "rank")) || i + 1}</span>
-                <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{trader(r)}</p><p className="text-xs text-muted-foreground">Volume {usd(pick(r, "volume", "volume_usd", "stats.volume"))} · {str(pick(r, "trades", "trade_count", "num_trades", "stats.trades")) || "–"} trade</p></div>
-                <span className={`text-sm font-bold ${pnl >= 0 ? "text-primary" : "text-destructive"}`}>{usd(pnl)}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{trader(r)}</p>
+                  <p className="text-xs text-muted-foreground">Volume {vol !== undefined ? usd(vol) : "–"} · {trades || "–"} trade</p>
+                  {tokens.length > 0 && <div className="mt-1 flex flex-wrap gap-1">{tokens.map((s) => <Link key={s} to="/cashtag" search={{ s: s.toUpperCase() }} className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">${s}</Link>)}</div>}
+                </div>
+                <span className={`text-sm font-bold ${Number.isFinite(pnl) ? (pnl >= 0 ? "text-primary" : "text-destructive") : "text-muted-foreground"}`}>{Number.isFinite(pnl) ? usd(pnl) : "–"}</span>
               </article>
             );
           })
