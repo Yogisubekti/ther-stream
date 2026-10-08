@@ -1,6 +1,7 @@
 import { PrivyProvider, usePrivy, useWallets } from "@privy-io/react-auth";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Copy, ExternalLink, Loader2, RefreshCw } from "lucide-react";
+// @ts-expect-error qrcode ships without types
 import QRCode from "qrcode";
 import { encodeFunctionData, erc20Abi, formatUnits, isAddress, parseUnits } from "viem";
 import { toast } from "sonner";
@@ -58,13 +59,13 @@ function Inner() {
   if (!authenticated) return <Button className="w-full" onClick={login}>Hubungkan dompet Mindcaster</Button>;
   if (!w) return <p className="text-sm text-destructive">Dompet bawaan belum ditemukan. Keluar lalu masuk lagi.</p>;
 
-  async function send() {
+  async function send(): Promise<void> {
     if (!w) return;
-    if (!isAddress(to)) return toast.error("Alamat tujuan tidak valid.");
+    if (!isAddress(to)) { toast.error("Alamat tujuan tidak valid."); return; }
     const t = TOKENS.find((x) => x.sym === sym)!;
     let value: bigint;
-    try { value = parseUnits(amount, t.decimals); } catch { return toast.error("Nominal tidak valid."); }
-    if (value <= 0n) return toast.error("Nominal tidak valid.");
+    try { value = parseUnits(amount, t.decimals); } catch { { toast.error("Nominal tidak valid."); return; } }
+    if (value <= 0n) { toast.error("Nominal tidak valid."); return; }
     setSending(true);
     try {
       await w.switchChain(BASE.id);
