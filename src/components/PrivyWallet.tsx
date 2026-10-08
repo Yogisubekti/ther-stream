@@ -144,7 +144,7 @@ function Inner() {
 
 export default function PrivyWallet() {
   return (
-    <PrivyProvider appId={PRIVY_APP_ID} config={{ loginMethods: ["email", "google"], defaultChain: SUPPORTED[0], supportedChains: SUPPORTED, embeddedWallets: { ethereum: { createOnLogin: "users-without-wallets" } } }}>
+    <PrivyProvider appId={PRIVY_APP_ID} config={{ loginMethods: ["email", "google"], defaultChain: SUPPORTED[0] as never, supportedChains: SUPPORTED as never, embeddedWallets: { ethereum: { createOnLogin: "users-without-wallets" } } }}>
       <Inner />
     </PrivyProvider>
   );
