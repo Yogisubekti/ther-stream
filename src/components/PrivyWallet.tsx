@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PRIVY_APP_ID } from "@/lib/privy.functions";
 import { CHAINS } from "@/lib/verification";
+import { SolanaPanel, SOL_RPC, SOL_WSS } from "@/components/SolanaWallet";
+import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
+import { createSolanaRpc, createSolanaRpcSubscriptions } from "@solana/kit";
 
 type Tok = { sym: string; address?: `0x${string}`; decimals: number };
 type Net = { key: string; id: number; name: string; native: string; rpc: string; explorer: string; explorerName: string; swap: string; tokens: Tok[] };
@@ -68,8 +71,15 @@ function Inner() {
   useEffect(() => { void load(); }, [load]);
   useEffect(() => { if (w) void QRCode.toDataURL(w.address, { margin: 1, width: 240 }).then(setQr); }, [w]);
 
+  const selector = (
+    <select aria-label="Jaringan" value={netKey} onChange={(e) => setNetKey(e.target.value)} className="rounded-full border-0 bg-primary/15 px-2.5 py-1 text-[11px] font-bold text-primary outline-none">
+      {NETS.map((n) => <option key={n.key} value={n.key}>{n.name}</option>)}
+      <option value="solana">Solana</option>
+    </select>
+  );
   if (!ready || !wReady) return <p className="flex justify-center py-10"><Loader2 className="size-6 animate-spin" /></p>;
   if (!authenticated) return <Button className="w-full" onClick={login}>Hubungkan dompet Mindcaster</Button>;
+  if (netKey === "solana") return <SolanaPanel selector={selector} />;
   if (!w) return <p className="text-sm text-destructive">Dompet bawaan belum ditemukan. Keluar lalu masuk lagi.</p>;
 
   async function send(): Promise<void> {
@@ -97,10 +107,7 @@ function Inner() {
     <>
       <section className="glass-panel rounded-[24px] border border-surface/80 p-5">
         <div className="flex items-center justify-between">
-          <select aria-label="Jaringan" value={netKey} onChange={(e) => setNetKey(e.target.value)} className="rounded-full border-0 bg-primary/15 px-2.5 py-1 text-[11px] font-bold text-primary outline-none">
-            {NETS.map((n) => <option key={n.key} value={n.key}>{n.name}</option>)}
-            <option disabled>Solana (soon)</option>
-          </select>
+          {selector}
           <button onClick={() => { void navigator.clipboard.writeText(w.address); toast.success("Alamat disalin"); }} className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground"><Copy className="size-3.5" />{short}</button>
         </div>
         <ul className="mt-4 space-y-2">
