@@ -140,10 +140,10 @@ function HomeFeed({ user, view, onHome }: { user: User; view: HomeView; onHome: 
       {posts.map((p, i) => (
         <Fragment key={p.id}>
           <PostCard post={p} userId={user.id} onChange={load} onError={setError} />
-          {(i + 1) % AD_EVERY === 0 && <SponsoredPost ad={ADS[((i + 1) / AD_EVERY - 1) % ADS.length]} />}
+          {(i + 1) % AD_EVERY === 0 && <SponsoredPost ad={ADS[((i + 1) / AD_EVERY - 1) % ADS.length]!} />}
         </Fragment>
       ))}
-      {posts.length > 0 && posts.length < AD_EVERY && <SponsoredPost ad={ADS[0]} />}
+      {posts.length > 0 && posts.length < AD_EVERY && <SponsoredPost ad={ADS[0]!} />}
       </>}
     </>
   );
