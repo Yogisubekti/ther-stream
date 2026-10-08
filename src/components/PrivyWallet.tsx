@@ -37,29 +37,34 @@ function Inner() {
   const { ready, authenticated, login } = usePrivy();
   const { wallets, ready: wReady } = useWallets();
   const w = wallets.find((x) => x.walletClientType === "privy");
+  const [netKey, setNetKey] = useState("base");
+  const BASE = NETS.find((n) => n.key === netKey)!;
+  const TOKENS: Tok[] = [{ sym: BASE.native, decimals: 18 }, ...BASE.tokens];
   const [bal, setBal] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState<null | "receive" | "send">(null);
   const [qr, setQr] = useState("");
   const [to, setTo] = useState("");
   const [amount, setAmount] = useState("");
-  const [sym, setSym] = useState<Sym>("ETH");
+  const [sym, setSym] = useState("ETH");
   const [sending, setSending] = useState(false);
+  useEffect(() => { setSym(BASE.native); setBal({}); }, [BASE.native, netKey]);
 
   const load = useCallback(async () => {
     if (!w) return;
+    const net = NETS.find((n) => n.key === netKey)!;
     setLoading(true);
     try {
       const out: Record<string, string> = {};
-      for (const t of TOKENS) {
+      for (const t of [{ sym: net.native, decimals: 18 } as Tok, ...net.tokens]) {
         const v = t.address
-          ? await rpc("eth_call", [{ to: t.address, data: encodeFunctionData({ abi: erc20Abi, functionName: "balanceOf", args: [w.address as `0x${string}`] }) }, "latest"])
-          : await rpc("eth_getBalance", [w.address, "latest"]);
-        out[t.sym] = Number(formatUnits(v, t.decimals)).toLocaleString("en-US", { maximumFractionDigits: t.sym === "ETH" ? 6 : 2 });
+          ? await rpc(net.rpc, "eth_call", [{ to: t.address, data: encodeFunctionData({ abi: erc20Abi, functionName: "balanceOf", args: [w.address as `0x${string}`] }) }, "latest"])
+          : await rpc(net.rpc, "eth_getBalance", [w.address, "latest"]);
+        out[t.sym] = Number(formatUnits(v, t.decimals)).toLocaleString("en-US", { maximumFractionDigits: t.address ? 2 : 6 });
       }
       setBal(out);
     } catch { toast.error("Gagal memuat saldo."); } finally { setLoading(false); }
-  }, [w]);
+  }, [w, netKey]);
   useEffect(() => { void load(); }, [load]);
   useEffect(() => { if (w) void QRCode.toDataURL(w.address, { margin: 1, width: 240 }).then(setQr); }, [w]);
 
