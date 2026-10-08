@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Copy, ExternalLink, Loader2, RefreshCw } from "lucide-react";
 // @ts-expect-error qrcode ships without types
 import QRCode from "qrcode";
-import { encodeFunctionData, erc20Abi, formatUnits, isAddress, parseUnits } from "viem";
+import { defineChain, encodeFunctionData, erc20Abi, formatUnits, isAddress, parseUnits } from "viem";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -11,16 +11,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { PRIVY_APP_ID } from "@/lib/privy.functions";
 import { CHAINS } from "@/lib/verification";
 
-const BASE = CHAINS.base;
-type Sym = "ETH" | "USDC" | "USDT";
-const TOKENS: { sym: Sym; address?: `0x${string}`; decimals: number }[] = [
-  { sym: "ETH", decimals: 18 },
-  { sym: "USDC", ...BASE.tokens.USDC },
-  { sym: "USDT", ...BASE.tokens.USDT },
+type Tok = { sym: string; address?: `0x${string}`; decimals: number };
+type Net = { key: string; id: number; name: string; native: string; rpc: string; explorer: string; explorerName: string; swap: string; tokens: Tok[] };
+const NETS: Net[] = [
+  { key: "base", id: 8453, name: "Base", native: "ETH", rpc: CHAINS.base.rpc, explorer: CHAINS.base.explorer, explorerName: "BaseScan", swap: "https://app.uniswap.org/swap?chain=base",
+    tokens: [{ sym: "USDC", ...CHAINS.base.tokens.USDC }, { sym: "USDT", ...CHAINS.base.tokens.USDT }] },
+  { key: "robinhood", id: 4663, name: "Robinhood", native: "ETH", rpc: "https://rpc.mainnet.chain.robinhood.com", explorer: "https://robinhoodchain.blockscout.com", explorerName: "Blockscout", swap: "https://www.ponsfamily.com",
+    tokens: [{ sym: "PONS", address: "0x39dbed3a2bd333467115de45665cc57f813c4571", decimals: 18 }] },
+  { key: "ethereum", id: 1, name: "Ethereum", native: "ETH", rpc: "https://ethereum-rpc.publicnode.com", explorer: "https://etherscan.io", explorerName: "Etherscan", swap: "https://app.uniswap.org/swap?chain=mainnet",
+    tokens: [{ sym: "USDC", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", decimals: 6 }, { sym: "USDT", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", decimals: 6 }] },
+  { key: "bnb", id: 56, name: "BNB Chain", native: "BNB", rpc: CHAINS.bnb.rpc, explorer: CHAINS.bnb.explorer, explorerName: "BscScan", swap: "https://pancakeswap.finance/swap",
+    tokens: [{ sym: "USDC", ...CHAINS.bnb.tokens.USDC }, { sym: "USDT", ...CHAINS.bnb.tokens.USDT }] },
+  { key: "arbitrum", id: 42161, name: "Arbitrum", native: "ETH", rpc: "https://arb1.arbitrum.io/rpc", explorer: "https://arbiscan.io", explorerName: "Arbiscan", swap: "https://app.uniswap.org/swap?chain=arbitrum",
+    tokens: [{ sym: "USDC", address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", decimals: 6 }, { sym: "USDT", address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", decimals: 6 }] },
 ];
+const SUPPORTED = NETS.map((n) => defineChain({ id: n.id, name: n.name, nativeCurrency: { name: n.native, symbol: n.native, decimals: 18 }, rpcUrls: { default: { http: [n.rpc] } }, blockExplorers: { default: { name: n.explorerName, url: n.explorer } } }));
 
-async function rpc(method: string, params: unknown[]) {
-  const r = await fetch(BASE.rpc, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) });
+async function rpc(url: string, method: string, params: unknown[]) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) });
   const j = (await r.json()) as { result?: string };
   return BigInt(j.result && j.result !== "0x" ? j.result : "0x0");
 }
@@ -29,29 +37,34 @@ function Inner() {
   const { ready, authenticated, login } = usePrivy();
   const { wallets, ready: wReady } = useWallets();
   const w = wallets.find((x) => x.walletClientType === "privy");
+  const [netKey, setNetKey] = useState("base");
+  const BASE = NETS.find((n) => n.key === netKey)!;
+  const TOKENS: Tok[] = [{ sym: BASE.native, decimals: 18 }, ...BASE.tokens];
   const [bal, setBal] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState<null | "receive" | "send">(null);
   const [qr, setQr] = useState("");
   const [to, setTo] = useState("");
   const [amount, setAmount] = useState("");
-  const [sym, setSym] = useState<Sym>("ETH");
+  const [sym, setSym] = useState("ETH");
   const [sending, setSending] = useState(false);
+  useEffect(() => { setSym(BASE.native); setBal({}); }, [BASE.native, netKey]);
 
   const load = useCallback(async () => {
     if (!w) return;
+    const net = NETS.find((n) => n.key === netKey)!;
     setLoading(true);
     try {
       const out: Record<string, string> = {};
-      for (const t of TOKENS) {
+      for (const t of [{ sym: net.native, decimals: 18 } as Tok, ...net.tokens]) {
         const v = t.address
-          ? await rpc("eth_call", [{ to: t.address, data: encodeFunctionData({ abi: erc20Abi, functionName: "balanceOf", args: [w.address as `0x${string}`] }) }, "latest"])
-          : await rpc("eth_getBalance", [w.address, "latest"]);
-        out[t.sym] = Number(formatUnits(v, t.decimals)).toLocaleString("en-US", { maximumFractionDigits: t.sym === "ETH" ? 6 : 2 });
+          ? await rpc(net.rpc, "eth_call", [{ to: t.address, data: encodeFunctionData({ abi: erc20Abi, functionName: "balanceOf", args: [w.address as `0x${string}`] }) }, "latest"])
+          : await rpc(net.rpc, "eth_getBalance", [w.address, "latest"]);
+        out[t.sym] = Number(formatUnits(v, t.decimals)).toLocaleString("en-US", { maximumFractionDigits: t.address ? 2 : 6 });
       }
       setBal(out);
     } catch { toast.error("Gagal memuat saldo."); } finally { setLoading(false); }
-  }, [w]);
+  }, [w, netKey]);
   useEffect(() => { void load(); }, [load]);
   useEffect(() => { if (w) void QRCode.toDataURL(w.address, { margin: 1, width: 240 }).then(setQr); }, [w]);
 
@@ -84,7 +97,10 @@ function Inner() {
     <>
       <section className="glass-panel rounded-[24px] border border-surface/80 p-5">
         <div className="flex items-center justify-between">
-          <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-[11px] font-bold text-primary">{BASE.name}</span>
+          <select aria-label="Jaringan" value={netKey} onChange={(e) => setNetKey(e.target.value)} className="rounded-full border-0 bg-primary/15 px-2.5 py-1 text-[11px] font-bold text-primary outline-none">
+            {NETS.map((n) => <option key={n.key} value={n.key}>{n.name}</option>)}
+            <option disabled>Solana (soon)</option>
+          </select>
           <button onClick={() => { void navigator.clipboard.writeText(w.address); toast.success("Alamat disalin"); }} className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground"><Copy className="size-3.5" />{short}</button>
         </div>
         <ul className="mt-4 space-y-2">
@@ -94,11 +110,11 @@ function Inner() {
         <div className="mt-5 grid grid-cols-3 gap-2">
           <Button variant="surface" onClick={() => setOpen("receive")}><ArrowDownLeft className="size-4" />Receive</Button>
           <Button variant="surface" onClick={() => setOpen("send")}><ArrowUpRight className="size-4" />Send</Button>
-          <Button variant="surface" asChild><a href={`https://app.uniswap.org/swap?chain=base`} target="_blank" rel="noreferrer"><ArrowLeftRight className="size-4" />Swap</a></Button>
+          <Button variant="surface" asChild><a href={BASE.swap} target="_blank" rel="noreferrer"><ArrowLeftRight className="size-4" />Swap</a></Button>
         </div>
         <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
           <button onClick={() => void load()} className="flex items-center gap-1"><RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />Refresh</button>
-          <a href={`${BASE.explorer}/address/${w.address}`} target="_blank" rel="noreferrer" className="flex items-center gap-1">BaseScan<ExternalLink className="size-3.5" /></a>
+          <a href={`${BASE.explorer}/address/${w.address}`} target="_blank" rel="noreferrer" className="flex items-center gap-1">{BASE.explorerName}<ExternalLink className="size-3.5" /></a>
         </div>
       </section>
 
@@ -118,7 +134,7 @@ function Inner() {
           <div className="grid grid-cols-3 gap-2">{TOKENS.map((t) => <Button key={t.sym} size="sm" variant={sym === t.sym ? "default" : "surface"} onClick={() => setSym(t.sym)}>{t.sym}</Button>)}</div>
           <input value={to} onChange={(e) => setTo(e.target.value.trim())} placeholder="Alamat tujuan 0x…" className="h-10 rounded-xl border border-border/60 bg-surface/75 px-3 font-mono text-sm outline-none focus:border-primary" />
           <input value={amount} onChange={(e) => setAmount(e.target.value.replace(",", "."))} inputMode="decimal" placeholder={`Nominal (saldo ${bal[sym] ?? "0"})`} className="h-10 rounded-xl border border-border/60 bg-surface/75 px-3 text-sm outline-none focus:border-primary" />
-          <p className="text-xs text-muted-foreground">Butuh sedikit ETH di Base untuk biaya jaringan.</p>
+          <p className="text-xs text-muted-foreground">Butuh sedikit {BASE.native} di {BASE.name} untuk biaya jaringan.</p>
           <Button disabled={sending || !to || !amount} onClick={() => void send()}>{sending ? <Loader2 className="size-4 animate-spin" /> : <ArrowUpRight className="size-4" />}Kirim {sym}</Button>
         </DialogContent>
       </Dialog>
@@ -128,7 +144,7 @@ function Inner() {
 
 export default function PrivyWallet() {
   return (
-    <PrivyProvider appId={PRIVY_APP_ID} config={{ loginMethods: ["email", "google"], embeddedWallets: { ethereum: { createOnLogin: "users-without-wallets" } } }}>
+    <PrivyProvider appId={PRIVY_APP_ID} config={{ loginMethods: ["email", "google"], defaultChain: SUPPORTED[0] as never, supportedChains: SUPPORTED as never, embeddedWallets: { ethereum: { createOnLogin: "users-without-wallets" } } }}>
       <Inner />
     </PrivyProvider>
   );
