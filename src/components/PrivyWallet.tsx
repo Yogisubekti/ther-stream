@@ -151,7 +151,10 @@ function Inner() {
 
 export default function PrivyWallet() {
   return (
-    <PrivyProvider appId={PRIVY_APP_ID} config={{ loginMethods: ["email", "google"], defaultChain: SUPPORTED[0] as never, supportedChains: SUPPORTED as never, embeddedWallets: { ethereum: { createOnLogin: "users-without-wallets" } } }}>
+    <PrivyProvider appId={PRIVY_APP_ID} config={{ loginMethods: ["email", "google"], defaultChain: SUPPORTED[0] as never, supportedChains: SUPPORTED as never,
+      embeddedWallets: { ethereum: { createOnLogin: "users-without-wallets" }, solana: { createOnLogin: "users-without-wallets" } },
+      externalWallets: { solana: { connectors: toSolanaWalletConnectors() } },
+      solana: { rpcs: { "solana:mainnet": { rpc: createSolanaRpc(SOL_RPC), rpcSubscriptions: createSolanaRpcSubscriptions(SOL_WSS), blockExplorerUrl: "https://solscan.io" } } } }}>
       <Inner />
     </PrivyProvider>
   );
