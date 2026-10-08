@@ -155,11 +155,13 @@ export function Stories({ userId, onError }: { userId: string; onError: (m: stri
                 </div>
               ) : (
                 <>
-                  <form onSubmit={(e) => { e.preventDefault(); void findMusic(); }} className="flex items-center gap-2 rounded-full bg-white/15 py-2 pl-4 pr-1.5 text-sm backdrop-blur">
+                  <form onSubmit={(e) => { e.preventDefault(); void findMusic(mq); }} className="flex items-center gap-2 rounded-full bg-white/15 py-2 pl-4 pr-1.5 text-sm backdrop-blur">
                     <span aria-hidden>🎵</span>
                     <input value={mq} onChange={(e) => setMq(e.target.value)} placeholder="Search music (song or artist)" aria-label="Search music" className="min-w-0 flex-1 bg-transparent placeholder:text-white/60 focus:outline-none" />
-                    <button type="submit" disabled={searching} className="shrink-0 rounded-full bg-white/20 px-4 py-1.5 text-xs">{searching ? "…" : "Search"}</button>
+                    <button type="submit" disabled={searching} className="shrink-0 rounded-full bg-white/20 px-4 py-1.5 text-xs">{searching ? "Searching…" : "Search"}</button>
                   </form>
+                  {searchErr && <p className="rounded-xl bg-destructive/80 px-3 py-2 text-xs">{searchErr}</p>}
+                  {!mq && results && results.length > 0 && <p className="px-1 text-xs text-white/70">Popular songs</p>}
                   {results && (
                     <ul className="max-h-44 overflow-y-auto rounded-2xl bg-white/10 p-1 backdrop-blur">
                       {results.length === 0 && <li className="p-3 text-sm text-white/70">No songs found.</li>}
