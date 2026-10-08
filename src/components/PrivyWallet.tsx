@@ -11,16 +11,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { PRIVY_APP_ID } from "@/lib/privy.functions";
 import { CHAINS } from "@/lib/verification";
 
-const BASE = CHAINS.base;
-type Sym = "ETH" | "USDC" | "USDT";
-const TOKENS: { sym: Sym; address?: `0x${string}`; decimals: number }[] = [
-  { sym: "ETH", decimals: 18 },
-  { sym: "USDC", ...BASE.tokens.USDC },
-  { sym: "USDT", ...BASE.tokens.USDT },
+type Tok = { sym: string; address?: `0x${string}`; decimals: number };
+type Net = { key: string; id: number; name: string; native: string; rpc: string; explorer: string; explorerName: string; swap: string; tokens: Tok[] };
+const NETS: Net[] = [
+  { key: "base", id: 8453, name: "Base", native: "ETH", rpc: CHAINS.base.rpc, explorer: CHAINS.base.explorer, explorerName: "BaseScan", swap: "https://app.uniswap.org/swap?chain=base",
+    tokens: [{ sym: "USDC", ...CHAINS.base.tokens.USDC }, { sym: "USDT", ...CHAINS.base.tokens.USDT }] },
+  { key: "robinhood", id: 4663, name: "Robinhood", native: "ETH", rpc: "https://rpc.mainnet.chain.robinhood.com", explorer: "https://robinhoodchain.blockscout.com", explorerName: "Blockscout", swap: "https://www.ponsfamily.com",
+    tokens: [{ sym: "PONS", address: "0x39dbed3a2bd333467115de45665cc57f813c4571", decimals: 18 }] },
+  { key: "ethereum", id: 1, name: "Ethereum", native: "ETH", rpc: "https://ethereum-rpc.publicnode.com", explorer: "https://etherscan.io", explorerName: "Etherscan", swap: "https://app.uniswap.org/swap?chain=mainnet",
+    tokens: [{ sym: "USDC", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", decimals: 6 }, { sym: "USDT", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", decimals: 6 }] },
+  { key: "bnb", id: 56, name: "BNB Chain", native: "BNB", rpc: CHAINS.bnb.rpc, explorer: CHAINS.bnb.explorer, explorerName: "BscScan", swap: "https://pancakeswap.finance/swap",
+    tokens: [{ sym: "USDC", ...CHAINS.bnb.tokens.USDC }, { sym: "USDT", ...CHAINS.bnb.tokens.USDT }] },
+  { key: "arbitrum", id: 42161, name: "Arbitrum", native: "ETH", rpc: "https://arb1.arbitrum.io/rpc", explorer: "https://arbiscan.io", explorerName: "Arbiscan", swap: "https://app.uniswap.org/swap?chain=arbitrum",
+    tokens: [{ sym: "USDC", address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", decimals: 6 }, { sym: "USDT", address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", decimals: 6 }] },
 ];
+const SUPPORTED = NETS.map((n) => defineChain({ id: n.id, name: n.name, nativeCurrency: { name: n.native, symbol: n.native, decimals: 18 }, rpcUrls: { default: { http: [n.rpc] } }, blockExplorers: { default: { name: n.explorerName, url: n.explorer } } }));
 
-async function rpc(method: string, params: unknown[]) {
-  const r = await fetch(BASE.rpc, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) });
+async function rpc(url: string, method: string, params: unknown[]) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) });
   const j = (await r.json()) as { result?: string };
   return BigInt(j.result && j.result !== "0x" ? j.result : "0x0");
 }
