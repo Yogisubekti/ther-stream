@@ -34,8 +34,14 @@ export function SolanaPanel({ selector }: { selector: React.ReactNode }) {
     setLoading(true);
     try {
       const { value } = await rpc.getBalance(address(w.address)).send();
-      const tok = await rpc.getTokenAccountsByOwner(address(w.address), { mint: address(USDC_MINT) }, { encoding: "jsonParsed" }).send();
-      const usdc = tok.value.reduce((s, a) => s + Number((a.account.data as { parsed: { info: { tokenAmount: { uiAmount: number } } } }).parsed.info.tokenAmount.uiAmount ?? 0), 0);
+      let usdc = 0;
+      try {
+        const { findAssociatedTokenPda, TOKEN_PROGRAM_ADDRESS } = await import("@solana-program/token");
+        const [ata] = await findAssociatedTokenPda({ owner: address(w.address), mint: address(USDC_MINT), tokenProgram: TOKEN_PROGRAM_ADDRESS });
+        const info = await rpc.getAccountInfo(ata, { encoding: "jsonParsed" }).send();
+        const d = info.value?.data as { parsed?: { info?: { tokenAmount?: { uiAmount?: number } } } } | undefined;
+        usdc = Number(d?.parsed?.info?.tokenAmount?.uiAmount ?? 0);
+      } catch { usdc = 0; }
       setBal({ SOL: (Number(value) / 1e9).toLocaleString("en-US", { maximumFractionDigits: 6 }), USDC: usdc.toLocaleString("en-US", { maximumFractionDigits: 2 }) });
     } catch { toast.error("Gagal memuat saldo Solana."); } finally { setLoading(false); }
   }, [w]);

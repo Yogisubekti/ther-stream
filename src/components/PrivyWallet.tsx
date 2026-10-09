@@ -42,7 +42,7 @@ function Inner() {
   const { wallets, ready: wReady } = useWallets();
   const w = wallets.find((x) => x.walletClientType === "privy");
   const [netKey, setNetKey] = useState("base");
-  const BASE = NETS.find((n) => n.key === netKey)!;
+  const BASE = (NETS.find((n) => n.key === netKey) ?? NETS[0]) as (typeof NETS)[number];
   const TOKENS: Tok[] = [{ sym: BASE.native, decimals: 18 }, ...BASE.tokens];
   const [bal, setBal] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -55,8 +55,8 @@ function Inner() {
   useEffect(() => { setSym(BASE.native); setBal({}); }, [BASE.native, netKey]);
 
   const load = useCallback(async () => {
-    if (!w) return;
-    const net = NETS.find((n) => n.key === netKey)!;
+    const net = NETS.find((n) => n.key === netKey);
+    if (!w || !net) return;
     setLoading(true);
     try {
       const out: Record<string, string> = {};
