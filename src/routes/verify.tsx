@@ -35,7 +35,7 @@ const PLAN_INFO: Record<PlanId, { title: string; price: string; note: string }> 
   yearly: { title: "Yearly", price: "$30 / year", note: "Blue check + OG badge + upcoming benefits" },
 };
 
-const PrivyWalletPay = lazy(() => import("@/components/PrivyWalletPay"));
+const PrivyWalletPay = lazy(() => (import.meta.env.SSR ? Promise.resolve({ default: () => null }) : import("@/components/PrivyWalletPay")) as Promise<typeof import("@/components/PrivyWalletPay")>);
 
 function VerifyPage({ userId }: { userId: string }) {
   const slotsFn = useServerFn(getPromoSlots);
