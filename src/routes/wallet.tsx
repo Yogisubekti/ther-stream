@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 
-const PrivyWallet = lazy(() => import("@/components/PrivyWallet"));
+const PrivyWallet = lazy(() => (import.meta.env.SSR ? Promise.resolve({ default: () => null }) : import("@/components/PrivyWallet")) as Promise<typeof import("@/components/PrivyWallet")>);
 
 export const Route = createFileRoute("/wallet")({
   head: () => ({
