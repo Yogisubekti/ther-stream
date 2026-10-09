@@ -1,4 +1,5 @@
 import { PrivyProvider, usePrivy, useWallets } from "@privy-io/react-auth";
+import { CreateEvmWallet } from "@/components/CreateEvmWallet";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Copy, ExternalLink, Loader2, RefreshCw } from "lucide-react";
 // @ts-expect-error qrcode ships without types
@@ -80,7 +81,7 @@ function Inner() {
   if (!ready || !wReady) return <p className="flex justify-center py-10"><Loader2 className="size-6 animate-spin" /></p>;
   if (!authenticated) return <Button className="w-full" onClick={login}>Hubungkan dompet Mindcaster</Button>;
   if (netKey === "solana") return <SolanaPanel selector={selector} />;
-  if (!w) return <p className="text-sm text-destructive">Dompet bawaan belum ditemukan. Keluar lalu masuk lagi.</p>;
+  if (!w) return <CreateEvmWallet />;
 
   async function send(): Promise<void> {
     if (!w) return;

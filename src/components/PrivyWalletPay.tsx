@@ -1,4 +1,5 @@
 import { PrivyProvider, usePrivy, useWallets } from "@privy-io/react-auth";
+import { CreateEvmWallet } from "@/components/CreateEvmWallet";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ function Inner({ label, step, onPay }: Props) {
 
   if (!ready || !wReady) return <Button className="w-full" disabled><Loader2 className="size-4 animate-spin" />Memuat dompet…</Button>;
   if (!authenticated) return <Button className="w-full" variant="surface" onClick={login}>Hubungkan dompet Mindcaster</Button>;
-  if (!embedded) return <p className="text-sm text-destructive">Dompet bawaan belum ditemukan. Keluar lalu masuk lagi.</p>;
+  if (!embedded) return <CreateEvmWallet />;
 
   return (
     <>
