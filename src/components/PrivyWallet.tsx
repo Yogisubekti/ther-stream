@@ -42,7 +42,7 @@ function Inner() {
   const { wallets, ready: wReady } = useWallets();
   const w = wallets.find((x) => x.walletClientType === "privy");
   const [netKey, setNetKey] = useState("base");
-  const BASE = NETS.find((n) => n.key === netKey) ?? NETS[0]!;
+  const BASE = (NETS.find((n) => n.key === netKey) ?? NETS[0]) as (typeof NETS)[number];
   const TOKENS: Tok[] = [{ sym: BASE.native, decimals: 18 }, ...BASE.tokens];
   const [bal, setBal] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
